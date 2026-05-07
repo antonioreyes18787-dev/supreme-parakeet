@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notion Workflows 201 — A 1-hour intro to connected systems</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f7f6f3;
+    --text-primary: #37352f;
+    --text-secondary: #787774;
+    --text-tertiary: #9b9a97;
+    --border: #e9e9e7;
+    --border-strong: #d3d1cb;
+    --hover: rgba(55,53,47,0.08);
+    --hover-light: rgba(55,53,47,0.04);
+    --selected: rgba(35,131,226,0.14);
+    --blue: #2383e2;
+    --blue-text: #1f6fc0;
+    --green: #448361;
+    --red: #d44c47;
+    --orange: #d9730d;
+
+    --callout-gray-bg: #f1f1ef;
+    --callout-brown-bg: #f4eeee;
+    --callout-blue-bg: #ddebf1;
+    --callout-yellow-bg: #fdecc8;
+    --callout-green-bg: #ddedea;
+    --callout-red-bg: #fbe4e4;
+    --callout-purple-bg: #eae4f2;
+    --callout-pink-bg: #f4dfeb;
+
+    --code-bg: rgba(135,131,120,0.15);
+    --code-text: #eb5757;
+
+    --shadow-sm: rgba(15,15,15,0.05) 0px 0px 0px 1px, rgba(15,15,15,0.1) 0px 3px 6px, rgba(15,15,15,0.2) 0px 9px 24px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+
+  body {
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+    color: var(--text-primary);
+    background: var(--bg);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar {
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 12px 14px 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .workspace-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #2383e2 0%, #1f6fc0 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .workspace-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .workspace-meta {
+    padding: 0 14px 12px 14px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+
+  .badge-tag {
+    display: inline-block;
+    background: var(--callout-blue-bg);
+    color: var(--blue-text);
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-left: 4px;
+  }
+
+  .sidebar-section {
+    padding: 8px 6px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .sidebar-section::-webkit-scrollbar { width: 6px; }
+  .sidebar-section::-webkit-scrollbar-thumb { background: rgba(55,53,47,0.15); border-radius: 3px; }
+
+  .sidebar-label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    padding: 8px 10px 4px 10px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    margin: 1px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-primary);
+    user-select: none;
+    transition: background 0.05s ease;
+  }
+
+  .sidebar-item:hover { background: var(--hover); }
+  .sidebar-item.active { background: var(--selected); font-weight: 500; }
+  .sidebar-item .chev { width: 14px; color: var(--text-tertiary); font-size: 10px; }
+  .sidebar-item .emoji { width: 18px; text-align: center; font-size: 14px; }
+  .sidebar-item .label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sidebar-item .num { color: var(--text-tertiary); font-size: 12px; }
+
+  .sidebar-children { padding-left: 14px; }
+  .sidebar-children .sidebar-item { font-size: 13.5px; }
+
+  .sidebar-section details > summary { list-style: none; }
+  .sidebar-section details > summary::-webkit-details-marker { display: none; }
+  .sidebar-section details > summary::marker { content: ''; }
+  .sidebar-section details > summary .chev {
+    display: inline-block;
+    transition: transform 0.15s ease;
+    transform: rotate(0deg);
+  }
+  .sidebar-section details:not([open]) > summary .chev {
+    transform: rotate(-90deg);
+  }
+
+  .sidebar-footer {
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-tertiary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .test-btn {
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .test-btn:hover { background: #1f1d1a; }
+  .test-btn.secondary {
+    background: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+  }
+  .test-btn.secondary:hover { background: var(--hover-light); }
+
+  /* ---------- MAIN ---------- */
+  .main {
+    background: var(--bg);
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 5;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .breadcrumb { display: flex; gap: 6px; align-items: center; }
+  .breadcrumb .sep { color: var(--text-tertiary); }
+  .breadcrumb .crumb { color: var(--text-secondary); }
+
+  .progress-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 300px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--blue);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .nav-controls { display: flex; gap: 6px; align-items: center; }
+  .nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-btn:hover { background: var(--hover); color: var(--text-primary); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .slide-counter { font-size: 13px; color: var(--text-tertiary); padding: 0 8px; min-width: 50px; text-align: center; }
+
+  .page {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 60px 80px 120px 80px;
+    animation: pageIn 0.25s ease;
+  }
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-icon {
+    font-size: 70px;
+    line-height: 1;
+    margin-bottom: 14px;
+    user-select: none;
+  }
+
+  .page-cover {
+    margin: -60px -80px 0 -80px;
+    height: 160px;
+    margin-bottom: 60px;
+  }
+  .page-cover.a { background: linear-gradient(135deg, #c5d8e8 0%, #a8c5e0 50%, #2383e2 100%); }
+  .page-cover.b { background: linear-gradient(135deg, #d4e6c8 0%, #b8d4a8 50%, #98b888 100%); }
+  .page-cover.c { background: linear-gradient(135deg, #e8d4f0 0%, #d0b8e0 50%, #b89cc8 100%); }
+  .page-cover.d { background: linear-gradient(135deg, #ffe9b3 0%, #f8c8a3 50%, #e8a8c0 100%); }
+  .page-cover.e { background: linear-gradient(135deg, #f4d0c8 0%, #ec9c98 50%, #d47880 100%); }
+  .page-cover.f { background: linear-gradient(135deg, #c8e0e8 0%, #88c0d0 50%, #2383e2 100%); }
+
+  h1.page-title {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .page p, .page li {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin: 6px 0;
+  }
+
+  .page h2 {
+    font-size: 26px;
+    font-weight: 600;
+    margin: 28px 0 8px 0;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .page h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 20px 0 6px 0;
+    line-height: 1.3;
+  }
+
+  .page ul, .page ol { padding-left: 26px; margin: 6px 0; }
+  .page li { margin: 4px 0; }
+
+  .page strong { font-weight: 600; color: var(--text-primary); }
+
+  .page code, .inline-code {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
+    font-size: 13.6px;
+  }
+
+  .kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--callout-gray-bg);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+
+  /* Callout */
+  .callout {
+    display: flex;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    margin: 16px 0;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .callout .icon { font-size: 20px; line-height: 1.2; flex-shrink: 0; }
+  .callout-gray { background: var(--callout-gray-bg); }
+  .callout-blue { background: var(--callout-blue-bg); }
+  .callout-yellow { background: var(--callout-yellow-bg); }
+  .callout-green { background: var(--callout-green-bg); }
+  .callout-red { background: var(--callout-red-bg); }
+  .callout-purple { background: var(--callout-purple-bg); }
+
+  /* Toggle */
+  details.toggle { margin: 8px 0; }
+  details.toggle summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 4px 0;
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    font-weight: 500;
+  }
+  details.toggle summary::-webkit-details-marker { display: none; }
+  details.toggle summary::before {
+    content: "▶";
+    color: var(--text-tertiary);
+    font-size: 11px;
+    transition: transform 0.15s ease;
+    margin-top: 5px;
+  }
+  details.toggle[open] summary::before { transform: rotate(90deg); }
+  details.toggle > div { padding: 4px 0 4px 18px; }
+
+  hr.div { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 14px 0; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    background: white;
+    font-size: 14px;
+  }
+  .card .card-title { font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+  .card .card-meta { font-size: 12px; color: var(--text-tertiary); }
+
+  /* Database mocks */
+  .db-mock {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 14px 0;
+    font-size: 13.5px;
+  }
+  .db-row {
+    display: grid;
+    grid-template-columns: 2.4fr 1fr 1fr 1.3fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .db-row.cols-3 { grid-template-columns: 2fr 1fr 1.3fr; }
+  .db-row:last-child { border-bottom: none; }
+  .db-row > div {
+    padding: 7px 10px;
+    border-right: 1px solid var(--border);
+  }
+  .db-row > div:last-child { border-right: none; }
+  .db-header {
+    background: var(--callout-gray-bg);
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 12.5px;
+  }
+
+  .db-mock-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    background: var(--callout-gray-bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .pill-blue { background: var(--callout-blue-bg); color: #183347; }
+  .pill-yellow { background: var(--callout-yellow-bg); color: #5e421e; }
+  .pill-green { background: var(--callout-green-bg); color: #1c3a2e; }
+  .pill-gray { background: var(--callout-gray-bg); color: var(--text-secondary); }
+  .pill-red { background: var(--callout-red-bg); color: #5d1d1d; }
+  .pill-purple { background: var(--callout-purple-bg); color: #3c2860; }
+  .pill-orange { background: #faebdd; color: #6b3a16; }
+
+  /* Synced block visual */
+  .synced-block {
+    border-left: 3px solid var(--red);
+    background: rgba(212,76,71,0.06);
+    padding: 10px 12px;
+    border-radius: 0 4px 4px 0;
+    margin: 6px 0;
+    font-size: 14px;
+    position: relative;
+  }
+  .synced-block::after {
+    content: "🔁 Synced";
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 11px;
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  /* Linked DB visual */
+  .linked-marker {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--blue-text);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  /* Relation arrow */
+  .relation-arrows {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: center;
+    margin: 14px 0;
+  }
+  .relation-arrow {
+    color: var(--blue);
+    font-size: 22px;
+    text-align: center;
+    line-height: 1;
+  }
+
+  /* Form mock */
+  .form-mock {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    background: white;
+    margin: 14px 0;
+    box-shadow: var(--shadow-sm);
+    max-width: 420px;
+  }
+  .form-mock h4 { margin: 0 0 4px 0; font-size: 16px; font-weight: 600; }
+  .form-mock .desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
+  .form-mock .form-field {
+    margin-bottom: 10px;
+  }
+  .form-mock .form-label {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .form-mock .form-input {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 7px 10px;
+    font-size: 13.5px;
+    color: var(--text-tertiary);
+    background: var(--callout-gray-bg);
+  }
+  .form-mock .form-submit {
+    background: var(--text-primary);
+    color: white;
+    padding: 7px 14px;
+    border-radius: 4px;
+    font-size: 13.5px;
+    border: none;
+    margin-top: 4px;
+    font-family: inherit;
+  }
+
+  /* Automation rule visual */
+  .auto-rule {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    margin: 12px 0;
+    background: white;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 12px;
+    font-size: 14px;
+    align-items: center;
+  }
+  .auto-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* Button block visual */
+  .btn-block {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--callout-blue-bg);
+    color: var(--blue-text);
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    border: 1px solid rgba(35,131,226,0.25);
+    margin: 8px 0;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .btn-block:hover { background: rgba(35,131,226,0.18); }
+
+  /* AI bubble */
+  .ai-bubble {
+    background: linear-gradient(135deg, var(--callout-purple-bg), var(--callout-blue-bg));
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    font-size: 14.5px;
+    border: 1px solid rgba(35,131,226,0.18);
+  }
+  .ai-bubble .ai-q {
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .ai-bubble .ai-a {
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .ai-bubble .ai-icon {
+    display: inline-block;
+    background: white;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blue-text);
+    margin-right: 4px;
+  }
+
+  /* Time tag */
+  .time-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--callout-blue-bg);
+    color: var(--blue-text);
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* Block demo */
+  .block-demo {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin: 6px 0;
+    font-size: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .block-demo .handle { color: var(--text-tertiary); font-size: 14px; }
+
+  /* TEST MODE */
+  .test-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 50px 60px 100px 60px;
+  }
+
+  .test-intro {
+    background: var(--callout-blue-bg);
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 28px;
+  }
+
+  .question {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    background: white;
+    transition: border-color 0.15s ease;
+  }
+  .question:hover { border-color: var(--border-strong); }
+
+  .q-num {
+    color: var(--text-tertiary);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .q-text {
+    font-size: 16.5px;
+    font-weight: 500;
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 6px; }
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 14.5px;
+    transition: all 0.1s ease;
+  }
+  .option:hover { background: var(--hover-light); }
+  .option input { margin: 0; cursor: pointer; accent-color: var(--blue); }
+  .option.selected { border-color: var(--blue); background: rgba(35,131,226,0.05); }
+  .option.correct { border-color: var(--green); background: var(--callout-green-bg); }
+  .option.incorrect { border-color: var(--red); background: var(--callout-red-bg); }
+  .option.reveal-correct { border-color: var(--green); background: var(--callout-green-bg); }
+
+  .submit-row {
+    margin-top: 28px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .submit-btn {
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .submit-btn:hover { background: #1f1d1a; }
+  .submit-btn:disabled { background: var(--text-tertiary); cursor: not-allowed; }
+
+  .results {
+    background: var(--callout-yellow-bg);
+    padding: 22px 24px;
+    border-radius: 8px;
+    margin-bottom: 28px;
+  }
+  .results.pass { background: var(--callout-green-bg); }
+  .results.fail { background: var(--callout-red-bg); }
+  .results h2 { margin: 0 0 6px 0; font-size: 24px; }
+  .results .score { font-size: 40px; font-weight: 700; margin: 6px 0; }
+
+  .explanation {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--callout-gray-bg);
+    border-radius: 5px;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+  }
+  .explanation strong { color: var(--text-primary); }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .page { padding: 30px 22px 100px 22px; }
+    .page-cover { margin: -30px -22px 0 -22px; }
+    h1.page-title { font-size: 32px; }
+    .test-page { padding: 30px 22px 80px 22px; }
+    .cols, .cols-3 { grid-template-columns: 1fr; }
+    .relation-arrows { grid-template-columns: 1fr; }
+    .relation-arrow { transform: rotate(90deg); }
+    .db-row { grid-template-columns: 1.5fr 1fr 1fr; font-size: 12px; }
+    .db-row > div:nth-child(4) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="workspace-icon">N</div>
+      <div class="workspace-name">Notion Academy</div>
+    </div>
+    <div class="workspace-meta">Workflows 201 · 1 hour course <span class="badge-tag">Blue badge</span></div>
+
+    <div class="sidebar-section" id="sidebar-list"></div>
+
+    <div class="sidebar-footer">
+      <span id="footer-progress">0 / 29 covered</span>
+      <button class="test-btn" id="open-test-btn">Take test</button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar" id="present-topbar">
+      <div class="breadcrumb">
+        <span class="crumb">📚 Notion Academy</span>
+        <span class="sep">/</span>
+        <span class="crumb" id="breadcrumb-current">Welcome</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="nav-controls">
+        <button class="nav-btn" id="prev-btn" aria-label="Previous">◀</button>
+        <span class="slide-counter" id="slide-counter">1 / 29</span>
+        <button class="nav-btn" id="next-btn" aria-label="Next">▶</button>
+      </div>
+    </div>
+
+    <div id="presentation"></div>
+
+    <div class="topbar hidden" id="test-topbar">
+      <div class="breadcrumb">
+        <span class="crumb">📚 Notion Academy</span>
+        <span class="sep">/</span>
+        <span class="crumb">Competency Test</span>
+      </div>
+      <div style="flex:1;"></div>
+      <button class="test-btn secondary" id="back-to-presentation-btn">← Back to lesson</button>
+    </div>
+
+    <div id="test-view" class="hidden"></div>
+  </main>
+</div>
+
+<script>
+const SECTIONS = [
+  { id: "intro",     name: "1 · Welcome",                 emoji: "👋" },
+  { id: "knowledge", name: "2 · Connected knowledge",     emoji: "🧠" },
+  { id: "ai",        name: "3 · Notion AI",               emoji: "✨" },
+  { id: "projects",  name: "4 · Project management",      emoji: "📊" },
+  { id: "issues",    name: "5 · Issue tracking",          emoji: "🐛" },
+  { id: "comms",     name: "6 · Communication & docs",    emoji: "💬" },
+  { id: "wrap",      name: "7 · Wrap-up",                 emoji: "🎯" },
+];
+
+const SLIDES = [
+  // ---------- INTRO ----------
+  {
+    section: "intro", emoji: "🎓", time: "0 min", cover: "a",
+    title: "Notion Workflows 201",
+    html: `
+      <p style="font-size:18px; color:var(--text-secondary); margin-top:0;">A 1-hour walkthrough of the connected systems behind every great Notion workspace.</p>
+      <hr class="div"/>
+      <div class="callout callout-blue">
+        <span class="icon">🎯</span>
+        <div>
+          <strong>This course maps to the Notion Academy <em>Workflows path</em> — the Blue Badge.</strong> By the end, you'll know how to wire databases together, automate small tasks, and build the kind of workspace teams actually rely on.
+        </div>
+      </div>
+      <p><strong>Format:</strong> 29 short slides · about 2 minutes each · plus a 10-question quiz.</p>
+      <p><span class="time-tag">⏱ ~3 min</span></p>
+    `
+  },
+  {
+    section: "intro", emoji: "🗺️", time: "3 min",
+    title: "What you'll learn",
+    html: `
+      <p>By the end of the hour, you'll be able to:</p>
+      <ul>
+        <li>Build <strong>scalable knowledge</strong> with synced blocks, linked databases, and embeds</li>
+        <li>Use <strong>Notion AI</strong> to find, summarize, and connect info across your workspace</li>
+        <li>Connect a <strong>project tracker</strong> to a task tracker using <strong>relations</strong> and <strong>rollups</strong></li>
+        <li>Build a <strong>bug / request system</strong> with forms, automations, and buttons</li>
+        <li>Streamline team communication with <strong>layouts, templates, and reusable docs</strong></li>
+      </ul>
+      <div class="callout callout-yellow">
+        <span class="icon">💡</span>
+        <div><strong>Tip:</strong> Open Notion in another tab and try each pattern as you go. The point isn't memorization — it's recognizing where these tools fit in your day-to-day.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "intro", emoji: "✅", time: "5 min",
+    title: "Before you start",
+    html: `
+      <p>This course assumes you're comfortable with the basics — pages, blocks, sharing, and creating a database.</p>
+      <div class="callout callout-gray">
+        <span class="icon">🧱</span>
+        <div>If any of those feel shaky, run through <strong>Notion Basics 101 (Essentials path)</strong> first. It's an hour well spent.</div>
+      </div>
+      <h3>The mental shift for this level</h3>
+      <p>Notion 101 was about <em>making things</em>. Notion 201 is about <em>making things talk to each other</em>. Instead of one big page, you'll build small connected pieces that automatically stay in sync.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+
+  // ---------- KNOWLEDGE ----------
+  {
+    section: "knowledge", emoji: "🧠", time: "7 min", cover: "b",
+    title: "Why connected knowledge matters",
+    html: `
+      <p style="font-size:17px;">When teams grow, the same info ends up copy-pasted in five places. Then four of them go stale.</p>
+      <p>Notion's solution: write something <strong>once</strong>, show it <strong>everywhere</strong>. When the source updates, every copy updates.</p>
+      <p>You'll do this with three tools:</p>
+      <div class="cols-3 cols">
+        <div class="card"><div class="card-title">🔁 Synced blocks</div><div class="card-meta">Reusable chunks of content</div></div>
+        <div class="card"><div class="card-title">🔗 Linked databases</div><div class="card-meta">Same data, different views</div></div>
+        <div class="card"><div class="card-title">🌐 Embeds & previews</div><div class="card-meta">Pull in external content</div></div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "knowledge", emoji: "🔁", time: "9 min",
+    title: "Synced blocks — write once, show everywhere",
+    html: `
+      <p>A <strong>synced block</strong> is a chunk of content that you can paste into multiple pages. Edit it in one place — every copy updates instantly.</p>
+      <h3>How to create one</h3>
+      <ol>
+        <li>Select the blocks you want to reuse</li>
+        <li>Click <strong>⋮⋮ → Turn into → Synced block</strong></li>
+        <li>Click <strong>Copy and sync</strong>, then paste it on any other page</li>
+      </ol>
+      <h3>What it looks like</h3>
+      <div class="synced-block">
+        <strong>Office hours:</strong> Mon–Fri, 9am–5pm PT. After hours, message the team channel for urgent issues.
+      </div>
+      <div class="synced-block">
+        <strong>Office hours:</strong> Mon–Fri, 9am–5pm PT. After hours, message the team channel for urgent issues.
+      </div>
+      <p>Both blocks above are the same one. Edit it on the wiki, it updates on the home page too.</p>
+      <p><span class="time-tag">⏱ ~3 min</span></p>
+    `
+  },
+  {
+    section: "knowledge", emoji: "💡", time: "12 min",
+    title: "When to reach for a synced block",
+    html: `
+      <p>Use a synced block whenever you find yourself thinking <em>"I need this same paragraph somewhere else."</em></p>
+      <h3>Great fits</h3>
+      <ul>
+        <li>Office hours, support contacts, on-call info</li>
+        <li>Company values that show up on the homepage AND the careers page</li>
+        <li>A safety disclaimer that needs to appear at the top of every SOP</li>
+        <li>Brand colors / fonts in a design wiki + a marketing wiki</li>
+      </ul>
+      <div class="callout callout-yellow">
+        <span class="icon">⚠️</span>
+        <div><strong>Watch out:</strong> deleting the original synced block can leave the copies stranded. If you need to reorganize, unsync first (⋮⋮ → Unsync).</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "knowledge", emoji: "🔗", time: "14 min",
+    title: "Linked databases — same data, new view",
+    html: `
+      <p>A <strong>linked database</strong> shows an existing database in another location. It's the same data — but you can give each location its own filter, sort, and view type.</p>
+      <h3>How to add one</h3>
+      <p>Type <kbd>/linked</kbd> on a new page → choose your database → done.</p>
+      <div class="db-mock">
+        <div class="db-mock-title">📋 Tasks (full database — source)</div>
+        <div class="db-row db-header"><div>Aa Task</div><div>Status</div><div>Owner</div><div>Project</div></div>
+        <div class="db-row"><div>Design new pricing page</div><div><span class="pill pill-yellow">In progress</span></div><div>Maya</div><div>Q4 launch</div></div>
+        <div class="db-row"><div>Fix login redirect bug</div><div><span class="pill pill-red">Blocked</span></div><div>Sam</div><div>Reliability</div></div>
+        <div class="db-row"><div>Draft Q4 OKRs</div><div><span class="pill pill-green">Done</span></div><div>Jules</div><div>Planning</div></div>
+      </div>
+      <div style="margin-top: 10px;">
+        <div class="linked-marker">↪ Linked view</div>
+        <div class="db-mock">
+          <div class="db-mock-title">🔵 My Tasks (linked, filtered to Owner = Maya)</div>
+          <div class="db-row db-header"><div>Aa Task</div><div>Status</div><div>Owner</div><div>Project</div></div>
+          <div class="db-row"><div>Design new pricing page</div><div><span class="pill pill-yellow">In progress</span></div><div>Maya</div><div>Q4 launch</div></div>
+        </div>
+      </div>
+      <p>One source database. Two locations. Different filters.</p>
+      <p><span class="time-tag">⏱ ~3 min</span></p>
+    `
+  },
+  {
+    section: "knowledge", emoji: "🎯", time: "17 min",
+    title: "Linked DB ≠ duplicated DB",
+    html: `
+      <h3>Two things people mix up</h3>
+      <div class="cols">
+        <div class="card">
+          <div class="card-title">🔗 Linked database</div>
+          <div class="card-meta">Same data, shown in another place. Edit a row anywhere → it updates everywhere.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">📑 Duplicated database</div>
+          <div class="card-meta">A whole new copy. Two separate sets of rows that drift apart over time.</div>
+        </div>
+      </div>
+      <div class="callout callout-blue">
+        <span class="icon">🧭</span>
+        <div><strong>Rule of thumb:</strong> if it's the same information, link it. If it's truly a different list (e.g. a separate team's backlog), duplicate it.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "knowledge", emoji: "🌐", time: "19 min",
+    title: "Embeds & web bookmarks",
+    html: `
+      <p>Notion can pull external content right into your page so people don't have to leave to read it.</p>
+      <ul>
+        <li><strong>Web bookmark</strong> — a thumbnail card with the link's title, image, and description. Type <kbd>/bookmark</kbd>.</li>
+        <li><strong>Embed</strong> — a fully interactive widget. Works for Figma, Loom, Google Drive files, YouTube, Miro, GitHub gists, and lots more. Type <kbd>/embed</kbd>.</li>
+      </ul>
+      <h3>What this looks like in real life</h3>
+      <ul>
+        <li>An onboarding page with a <strong>Loom welcome video</strong> embedded at the top</li>
+        <li>A design spec with a <strong>live Figma file</strong> right inside the doc</li>
+        <li>A project page that <strong>previews the spec PDF</strong> inline instead of forcing a download</li>
+      </ul>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "knowledge", emoji: "🛠️", time: "21 min",
+    title: "Practice — build a knowledge hub",
+    html: `
+      <div class="callout callout-green">
+        <span class="icon">🛠️</span>
+        <div><strong>Try this</strong> (5 minutes):
+          <ol style="margin-top:6px;">
+            <li>Create a page called <strong>Team Hub</strong></li>
+            <li>Add a <strong>synced block</strong> with this week's focus — paste it on a second page</li>
+            <li>Add a <strong>linked database</strong> of your tasks, filtered to <em>this week</em></li>
+            <li>Embed a <strong>Loom or YouTube video</strong> with <kbd>/embed</kbd></li>
+            <li>Edit the synced block — confirm the second page updated too</li>
+          </ol>
+        </div>
+      </div>
+      <p><span class="time-tag">⏱ ~5 min</span></p>
+    `
+  },
+
+  // ---------- AI ----------
+  {
+    section: "ai", emoji: "✨", time: "26 min", cover: "c",
+    title: "Notion AI — your workspace's brain",
+    html: `
+      <p>The bigger your workspace, the harder it is to remember where things live. Notion AI fixes this by reading <em>everything you have access to</em> and answering questions about it.</p>
+      <h3>The three things to know</h3>
+      <ol>
+        <li><strong>Ask AI</strong> — questions about your workspace</li>
+        <li><strong>AI in databases</strong> — auto-fill cells</li>
+        <li><strong>AI writing</strong> — summarize, draft, translate</li>
+      </ol>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "ai", emoji: "🔍", time: "28 min",
+    title: "Ask AI — your workspace, in one search",
+    html: `
+      <p>Press <kbd>Ctrl/Cmd + J</kbd> (or click <strong>Ask AI</strong>) and type a real question. Notion searches every page, doc, and database row you can see, then answers in plain language with links.</p>
+      <div class="ai-bubble">
+        <div class="ai-q"><span class="ai-icon">AI</span> What did the design team agree on for the Q4 launch palette?</div>
+        <div class="ai-a">Based on the Oct 14 sync notes and the brand wiki, the team chose a navy + warm beige palette with a coral accent. The decision doc has the hex codes and reasoning.</div>
+      </div>
+      <p>It pulls from your meeting notes, project docs, comments, even databases. Way faster than guessing keywords.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "ai", emoji: "🤖", time: "30 min",
+    title: "AI inside databases",
+    html: `
+      <p>You can add an <strong>AI property</strong> to any database column. Notion will auto-fill it based on the rest of the row.</p>
+      <h3>Real examples</h3>
+      <ul>
+        <li><strong>Meeting notes DB</strong> — AI summary column generates a 2-line recap from the page content</li>
+        <li><strong>Customer feedback DB</strong> — AI sentiment column auto-tags each entry as positive / neutral / negative</li>
+        <li><strong>Tasks DB</strong> — AI key info column extracts the dates and links from the task description</li>
+      </ul>
+      <div class="callout callout-purple">
+        <span class="icon">⚡</span>
+        <div>You write the prompt once. Every new row gets the same treatment automatically.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "ai", emoji: "✍️", time: "32 min",
+    title: "AI writing — drafting and summarizing",
+    html: `
+      <p>On any page, hit <kbd>Space</kbd> on a blank line or highlight text and pick <strong>Ask AI</strong>. Common moves:</p>
+      <ul>
+        <li><strong>Summarize this page</strong> — long meeting notes → 5 bullets</li>
+        <li><strong>Find action items</strong> — pulls every "we should…" into a clean list</li>
+        <li><strong>Translate</strong> — into Spanish, Japanese, anything</li>
+        <li><strong>Improve writing</strong> — softer tone, shorter, more formal</li>
+      </ul>
+      <div class="callout callout-yellow">
+        <span class="icon">📝</span>
+        <div><strong>Pro habit:</strong> at the top of every meeting notes page, drop a "Summary" toggle and let AI fill it. Future-you will thank current-you.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+
+  // ---------- PROJECTS ----------
+  {
+    section: "projects", emoji: "📊", time: "34 min", cover: "d",
+    title: "Project management — the connected setup",
+    html: `
+      <p>Most teams need two databases that talk to each other:</p>
+      <div class="cols">
+        <div class="card"><div class="card-title">📁 Projects</div><div class="card-meta">Big efforts. Goals. Owners. Timelines.</div></div>
+        <div class="card"><div class="card-title">✅ Tasks</div><div class="card-meta">The actual work. Each task belongs to a project.</div></div>
+      </div>
+      <p>Once you connect them, you get something powerful: <strong>each project automatically shows its tasks</strong>, and each project can show <strong>summary stats</strong> like "% complete" or "tasks remaining".</p>
+      <p>Two tools make this happen: <strong>relations</strong> and <strong>rollups</strong>.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "projects", emoji: "↔️", time: "36 min",
+    title: "Relations — connecting databases",
+    html: `
+      <p>A <strong>relation property</strong> is a column whose values are rows from another database.</p>
+      <p>Add a <em>Project</em> relation property to your Tasks database. Now every task can be linked to a project.</p>
+      <div class="relation-arrows">
+        <div class="db-mock">
+          <div class="db-mock-title">📁 Projects</div>
+          <div class="db-row cols-3 db-header"><div>Aa Name</div><div>Status</div><div>Lead</div></div>
+          <div class="db-row cols-3"><div>Q4 launch</div><div><span class="pill pill-yellow">Active</span></div><div>Maya</div></div>
+          <div class="db-row cols-3"><div>Reliability</div><div><span class="pill pill-yellow">Active</span></div><div>Sam</div></div>
+        </div>
+        <div class="relation-arrow">↔</div>
+        <div class="db-mock">
+          <div class="db-mock-title">✅ Tasks</div>
+          <div class="db-row cols-3 db-header"><div>Aa Task</div><div>Status</div><div>Project</div></div>
+          <div class="db-row cols-3"><div>Pricing page</div><div><span class="pill pill-yellow">Doing</span></div><div>↔ Q4 launch</div></div>
+          <div class="db-row cols-3"><div>Login bug</div><div><span class="pill pill-red">Blocked</span></div><div>↔ Reliability</div></div>
+        </div>
+      </div>
+      <p>Open the <em>Q4 launch</em> project page → you'll see the related tasks listed automatically.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "projects", emoji: "🔂", time: "38 min",
+    title: "Rollups — pulling info from related rows",
+    html: `
+      <p>Once two databases are related, a <strong>rollup property</strong> can pull info from the related rows and summarize it.</p>
+      <h3>What you can roll up</h3>
+      <ul>
+        <li><strong>Count</strong> — how many tasks does this project have?</li>
+        <li><strong>Percent checked</strong> — % of tasks marked done → instant progress bar</li>
+        <li><strong>Earliest / latest date</strong> — when does this project actually start and end?</li>
+        <li><strong>Sum / average</strong> of any number column (estimated hours, story points)</li>
+      </ul>
+      <div class="db-mock">
+        <div class="db-mock-title">📁 Projects (with rollups)</div>
+        <div class="db-row db-header"><div>Aa Project</div><div># Tasks</div><div>% Done</div><div>End date</div></div>
+        <div class="db-row"><div>Q4 launch</div><div>12</div><div><span class="pill pill-yellow">58%</span></div><div>Dec 15</div></div>
+        <div class="db-row"><div>Reliability</div><div>7</div><div><span class="pill pill-green">86%</span></div><div>Nov 22</div></div>
+      </div>
+      <p>None of those columns are typed by hand. They're rolled up automatically from Tasks.</p>
+      <p><span class="time-tag">⏱ ~3 min</span></p>
+    `
+  },
+  {
+    section: "projects", emoji: "🧠", time: "41 min",
+    title: "How relations & rollups think",
+    html: `
+      <div class="callout callout-blue">
+        <span class="icon">🪜</span>
+        <div><strong>The two-step rule</strong>:
+          <ol style="margin: 4px 0 0 0;">
+            <li><strong>Relation</strong> connects rows in two databases.</li>
+            <li><strong>Rollup</strong> reaches across that relation and summarizes data from the other side.</li>
+          </ol>
+        </div>
+      </div>
+      <p>You always need a relation first. The rollup is the second step that makes it useful at a glance.</p>
+      <h3>One more pattern: the dual relation</h3>
+      <p>By default, when you add a relation in Tasks pointing to Projects, Notion offers to <strong>show the relation back</strong> in Projects too. Say yes — that's how the Project page knows to display its tasks.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "projects", emoji: "🛠️", time: "43 min",
+    title: "Practice — build the project tracker",
+    html: `
+      <div class="callout callout-green">
+        <span class="icon">🛠️</span>
+        <div><strong>Try this</strong> (6 minutes):
+          <ol style="margin-top:6px;">
+            <li>Create two databases: <strong>Projects</strong> and <strong>Tasks</strong></li>
+            <li>In Tasks, add a <strong>Relation</strong> property → Projects</li>
+            <li>Create 2 projects, then add 3–5 tasks linked to each</li>
+            <li>In Projects, add a <strong>Rollup</strong>:
+              <ul>
+                <li>Property: Tasks → Status</li>
+                <li>Calculate: <em>Percent checked</em> (or count)</li>
+              </ul>
+            </li>
+            <li>Open a project page — confirm its tasks show below</li>
+          </ol>
+        </div>
+      </div>
+      <p>If you build nothing else from this course, build this. It's the backbone of every team workspace.</p>
+      <p><span class="time-tag">⏱ ~6 min</span></p>
+    `
+  },
+
+  // ---------- ISSUES ----------
+  {
+    section: "issues", emoji: "🐛", time: "49 min", cover: "e",
+    title: "Issue tracking — capture, route, resolve",
+    html: `
+      <p>Bug reports, support tickets, design requests — they all follow the same shape:</p>
+      <ol>
+        <li>Someone <strong>submits</strong> something (often through a form)</li>
+        <li>It lands as a <strong>row</strong> in a database</li>
+        <li>An <strong>automation</strong> assigns it, tags it, or notifies someone</li>
+        <li>A <strong>button</strong> or two-click action helps the team act fast</li>
+      </ol>
+      <p>You'll learn each piece next.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "issues", emoji: "📨", time: "51 min",
+    title: "Forms — capture without exposing the database",
+    html: `
+      <p>A <strong>form</strong> is a polished page with input fields. Submissions become rows in a database. The submitter never sees the rest of the database — which keeps things clean and private.</p>
+      <div class="form-mock">
+        <h4>🐛 Report a bug</h4>
+        <div class="desc">Tell us what broke. Engineering will pick it up.</div>
+        <div class="form-field">
+          <div class="form-label">Title</div>
+          <div class="form-input">e.g. Login button is unresponsive</div>
+        </div>
+        <div class="form-field">
+          <div class="form-label">Severity</div>
+          <div class="form-input">Select…</div>
+        </div>
+        <div class="form-field">
+          <div class="form-label">Steps to reproduce</div>
+          <div class="form-input">Describe what you did…</div>
+        </div>
+        <button class="form-submit">Submit</button>
+      </div>
+      <p>Add a form view to any database (<kbd>+ New view → Form</kbd>) and share its public link.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "issues", emoji: "⚙️", time: "53 min",
+    title: "Automations — when X happens, do Y",
+    html: `
+      <p>A <strong>database automation</strong> watches for a trigger and runs an action. No code. Click <strong>⚡</strong> at the top of a database to set one up.</p>
+      <h3>Anatomy</h3>
+      <div class="auto-rule">
+        <div class="auto-tag">When</div>
+        <div>A new page is added to <strong>Bug Reports</strong></div>
+        <div class="auto-tag">Then</div>
+        <div>Set <strong>Status</strong> to <span class="pill pill-orange">Triage</span>, set <strong>Priority</strong> to Medium, and notify <strong>@Engineering</strong></div>
+      </div>
+      <h3>Common triggers and actions</h3>
+      <ul>
+        <li><strong>When</strong> a property changes / a row is added / a date arrives</li>
+        <li><strong>Then</strong> edit a property, add a page, send a Slack message, post a comment, run a webhook</li>
+      </ul>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "issues", emoji: "🔘", time: "55 min",
+    title: "Buttons — one-click repeating actions",
+    html: `
+      <p>A <strong>button block</strong> runs a tiny workflow when someone clicks it. Type <kbd>/button</kbd> on any page.</p>
+      <h3>What buttons can do</h3>
+      <ul>
+        <li>Add a new row to a database with properties pre-filled</li>
+        <li>Edit a property on the current page (e.g. flip Status to "In review")</li>
+        <li>Open a link or another page</li>
+      </ul>
+      <h3>Real example</h3>
+      <button class="btn-block">＋ New bug report (pre-filled with reporter & date)</button>
+      <p>One click → a new bug appears in the database with you as the reporter and today's date already set. Saves five clicks every time.</p>
+      <div class="callout callout-purple">
+        <span class="icon">🪄</span>
+        <div><strong>Buttons vs Automations:</strong> a button is something a person clicks. An automation runs on its own when a condition is met.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "issues", emoji: "🛠️", time: "57 min",
+    title: "Practice — build a bug tracker",
+    html: `
+      <div class="callout callout-green">
+        <span class="icon">🛠️</span>
+        <div><strong>Try this</strong> (5 minutes):
+          <ol style="margin-top:6px;">
+            <li>Create a database called <strong>Bug Reports</strong> with: Title, Severity (select), Status (select), Reporter (person), Date (date)</li>
+            <li>Add a <strong>Form view</strong> with the title, severity, and description visible to submitters</li>
+            <li>Add an <strong>automation</strong>: when a new page is added → set Status to "Triage"</li>
+            <li>Add a <strong>button</strong> on your team's home page that creates a pre-filled bug report</li>
+          </ol>
+        </div>
+      </div>
+      <p><span class="time-tag">⏱ ~5 min</span></p>
+    `
+  },
+
+  // ---------- COMMS ----------
+  {
+    section: "comms", emoji: "💬", time: "62 min", cover: "f",
+    title: "Communication — docs that don't suck to read",
+    html: `
+      <p>The last piece of a great workflow is the human one: <strong>writing things down so others can find and use them</strong>.</p>
+      <p>Three patterns that make docs feel polished:</p>
+      <ul>
+        <li><strong>Layouts</strong> — columns, toggles, dividers</li>
+        <li><strong>Templates</strong> — reusable structures so every doc starts strong</li>
+        <li><strong>Headings & TOC</strong> — make long pages skimmable</li>
+      </ul>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "comms", emoji: "📐", time: "64 min",
+    title: "Layouts — columns, toggles, callouts",
+    html: `
+      <p>A wall of text is exhausting. Use Notion's layout tools to break it up.</p>
+      <h3>Columns</h3>
+      <p>Drag any block to the right edge of another to create a 2-column layout. Great for "Decision" + "Context" or "Pros" + "Cons" side by side.</p>
+      <h3>Toggles</h3>
+      <details class="toggle"><summary>Click to see the long version of this answer</summary><div>Hidden until clicked. Perfect for FAQs, optional context, or appendices that would otherwise crowd the page.</div></details>
+      <h3>Callouts</h3>
+      <div class="callout callout-yellow"><span class="icon">⭐</span><div>For the one thing you really want the reader to remember.</div></div>
+      <p>Don't overdo it. The point is to highlight the <em>most</em> important stuff, not all of it.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "comms", emoji: "📋", time: "66 min",
+    title: "Templates — your team's starting line",
+    html: `
+      <p>A <strong>template</strong> is a reusable page layout. Anyone on the team can spin up a new doc with the same structure in one click.</p>
+      <h3>Two kinds</h3>
+      <ul>
+        <li><strong>Page templates</strong> — a button on a page that creates a new page from a template (good for an SOP library)</li>
+        <li><strong>Database templates</strong> — every new row in a database starts with this content. (Click the ▼ next to <strong>New</strong> at the top of any database to manage them.)</li>
+      </ul>
+      <h3>Great template candidates</h3>
+      <ul>
+        <li><strong>1:1 meeting notes</strong> — same agenda every week</li>
+        <li><strong>Project kickoff</strong> — goals, scope, owners, risks</li>
+        <li><strong>Bug report</strong> — title, steps, expected, actual, environment</li>
+        <li><strong>Decision doc</strong> — context, options, decision, why</li>
+      </ul>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "comms", emoji: "🛠️", time: "68 min",
+    title: "Practice — meeting notes template",
+    html: `
+      <div class="callout callout-green">
+        <span class="icon">🛠️</span>
+        <div><strong>Try this</strong> (4 minutes):
+          <ol style="margin-top:6px;">
+            <li>In your <strong>Meeting Notes</strong> database, click the ▼ next to <strong>New</strong> → <strong>+ New template</strong></li>
+            <li>Give it the structure you actually want every time:
+              <ul>
+                <li>Heading: Agenda</li>
+                <li>Heading: Notes</li>
+                <li>Heading: Action items (as a to-do list)</li>
+                <li>A toggle: AI summary (filled later)</li>
+              </ul>
+            </li>
+            <li>Save. From now on, "New from template" creates a perfectly structured page in one click.</li>
+          </ol>
+        </div>
+      </div>
+      <p><span class="time-tag">⏱ ~4 min</span></p>
+    `
+  },
+
+  // ---------- WRAP ----------
+  {
+    section: "wrap", emoji: "🎯", time: "72 min", cover: "a",
+    title: "Recap — what you covered",
+    html: `
+      <ul>
+        <li>✅ <strong>Connected knowledge</strong> — synced blocks, linked databases, embeds. Write once, show everywhere.</li>
+        <li>✅ <strong>Notion AI</strong> — Ask AI to search, AI properties to enrich rows, AI writing to summarize.</li>
+        <li>✅ <strong>Project management</strong> — Projects + Tasks connected by relations, summarized by rollups.</li>
+        <li>✅ <strong>Issue tracking</strong> — forms collect, automations route, buttons accelerate.</li>
+        <li>✅ <strong>Communication</strong> — layouts, templates, and headings turn a wall of text into a usable doc.</li>
+      </ul>
+      <p>Big picture: you're no longer just <em>using</em> Notion — you're <em>designing systems</em> in it.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "wrap", emoji: "🌱", time: "74 min",
+    title: "Tips & next steps",
+    html: `
+      <ul>
+        <li><strong>Start with one connected pair.</strong> Projects + Tasks is the gateway drug. Build that first, then connect more.</li>
+        <li><strong>Audit before you add.</strong> Found yourself copying info? That's a synced-block opportunity. Found yourself filtering manually? Linked DB.</li>
+        <li><strong>Templates are leverage.</strong> A good meeting-notes template saves your team minutes per meeting × dozens of meetings per week.</li>
+        <li><strong>One automation at a time.</strong> Don't try to wire up six rules at once. Add one, watch it work for a week, then add another.</li>
+      </ul>
+      <h3>Where to go next</h3>
+      <ul>
+        <li><strong>Notion Academy — Advanced path</strong> (formulas, complex automations, workspace architecture)</li>
+        <li><strong>Templates Gallery</strong> — duplicate well-built workspaces and reverse-engineer them</li>
+        <li><strong>r/Notion</strong> on Reddit, plus YouTube creators like Thomas Frank Explains and Marie Poulin</li>
+      </ul>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "wrap", emoji: "🧪", time: "76 min",
+    title: "Ready for the test?",
+    html: `
+      <p style="font-size:17px;">Ten multiple-choice questions to lock in what you learned.</p>
+      <ul>
+        <li>Untimed</li>
+        <li>You can change answers before submitting</li>
+        <li>Pass mark: 7 / 10</li>
+      </ul>
+      <div style="margin-top:24px;">
+        <button class="submit-btn" id="start-test-btn">Start the competency test →</button>
+      </div>
+    `
+  },
+];
+
+const QUIZ = [
+  {
+    q: "What's the main benefit of using a synced block?",
+    options: [
+      "It saves storage space",
+      "Edit it in one place and every copy updates everywhere",
+      "It auto-translates content",
+      "It hides content from search"
+    ],
+    correct: 1,
+    explain: "Synced blocks let you reuse content across pages. Update the source once, every linked instance updates instantly."
+  },
+  {
+    q: "A linked database is best described as...",
+    options: [
+      "A brand-new database with its own data",
+      "A view of an existing database in another location, with its own filters/sort/view type",
+      "A database that's connected to a Google Sheet",
+      "A database that's locked from editing"
+    ],
+    correct: 1,
+    explain: "A linked database shows the same source data somewhere else. You can give that location a different filter or view, but the data is shared."
+  },
+  {
+    q: "What does a relation property do?",
+    options: [
+      "Calculates a total across rows",
+      "Sends a notification when a row changes",
+      "Connects rows in one database to rows in another",
+      "Hides a column based on permissions"
+    ],
+    correct: 2,
+    explain: "Relations link records together. They're step one — rollups (which summarize across that link) are step two."
+  },
+  {
+    q: "What does a rollup property do?",
+    options: [
+      "Renames a column based on its content",
+      "Pulls data from related rows and summarizes it (count, percent, sum, etc.)",
+      "Generates a unique ID for each row",
+      "Translates a property to another language"
+    ],
+    correct: 1,
+    explain: "Rollups reach across a relation and aggregate. Use them to show '# of tasks', '% done', or 'project end date' on a project row."
+  },
+  {
+    q: "Why use a form on a Notion database?",
+    options: [
+      "To print the database",
+      "To let people submit info that becomes a database row, without seeing the rest of the database",
+      "To apply a template automatically",
+      "To lock the database from editing"
+    ],
+    correct: 1,
+    explain: "Forms are a clean public-facing way to collect submissions. The submitter never sees the underlying data."
+  },
+  {
+    q: "A Notion database automation is built from...",
+    options: [
+      "Triggers (when something happens) and actions (do something)",
+      "Plugins downloaded from a marketplace",
+      "Email schedules only",
+      "Code snippets pasted into the page"
+    ],
+    correct: 0,
+    explain: "Every automation has a When (trigger) and a Then (action). For example: when a row is added → set Status to 'Triage'."
+  },
+  {
+    q: "When should you reach for a button block instead of an automation?",
+    options: [
+      "When the action should run on its own with no human involved",
+      "When you want a person to click to run a small repeating action (like 'create a pre-filled task')",
+      "When you need to send email",
+      "Buttons and automations do the exact same thing"
+    ],
+    correct: 1,
+    explain: "Buttons are for human-driven actions. Automations are for hands-off rules that run when conditions are met."
+  },
+  {
+    q: "A database template is...",
+    options: [
+      "A backup copy of the database",
+      "A pre-filled new row whose properties and content come from a saved structure",
+      "A formula that runs once",
+      "An automation that triggers on schedule"
+    ],
+    correct: 1,
+    explain: "Database templates set the default content (and even property values) for new rows — perfect for meeting notes, bug reports, or 1:1s."
+  },
+  {
+    q: "You want each task to live under exactly one project, and you want each project to show its task progress. What do you use?",
+    options: [
+      "Two separate workspaces",
+      "A relation between Tasks and Projects, plus a rollup on Projects to summarize the related tasks",
+      "A formula on the Tasks database",
+      "A synced block of the task list"
+    ],
+    correct: 1,
+    explain: "This is the canonical Workflows pattern: relation connects the rows, rollup summarizes across the connection."
+  },
+  {
+    q: "You can't remember which doc has the Q4 launch decisions. What's the fastest way to find it?",
+    options: [
+      "Use Ask AI to ask the question in plain language across your workspace",
+      "Open every page in your sidebar one at a time",
+      "Wait for a teammate to send you the link",
+      "Create a new page and rebuild the decisions from memory"
+    ],
+    correct: 0,
+    explain: "Ask AI (Cmd/Ctrl+J) searches across pages, docs, and database content with natural language — way faster than keyword guessing."
+  },
+];
+
+let currentSlide = 0;
+let visited = new Set([0]);
+let testAnswers = new Array(QUIZ.length).fill(null);
+let testSubmitted = false;
+
+function renderSidebar() {
+  const root = document.getElementById('sidebar-list');
+  let html = '<div class="sidebar-label">Course outline</div>';
+
+  for (const sec of SECTIONS) {
+    const slidesInSec = SLIDES.map((s,i)=>({s,i})).filter(x=>x.s.section===sec.id);
+    const visitedInSec = slidesInSec.filter(x=>visited.has(x.i)).length;
+    html += `
+      <details ${slidesInSec.some(x=>x.i===currentSlide)?'open':''}>
+        <summary class="sidebar-item" style="font-weight:500;">
+          <span class="chev">▾</span>
+          <span class="emoji">${sec.emoji}</span>
+          <span class="label">${sec.name}</span>
+          <span class="num">${visitedInSec}/${slidesInSec.length}</span>
+        </summary>
+        <div class="sidebar-children">
+          ${slidesInSec.map(x => `
+            <div class="sidebar-item ${x.i===currentSlide?'active':''}" data-slide="${x.i}">
+              <span class="chev"></span>
+              <span class="emoji">${x.s.emoji}</span>
+              <span class="label">${x.s.title}</span>
+            </div>
+          `).join('')}
+        </div>
+      </details>
+    `;
+  }
+  root.innerHTML = html;
+
+  root.querySelectorAll('.sidebar-item[data-slide]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      goTo(parseInt(el.dataset.slide));
+    });
+  });
+}
+
+function renderSlide() {
+  const slide = SLIDES[currentSlide];
+  const root = document.getElementById('presentation');
+  const coverHtml = slide.cover ? `<div class="page-cover ${slide.cover}"></div>` : '';
+
+  root.innerHTML = `
+    <div class="page" key="${currentSlide}">
+      ${coverHtml}
+      <div class="page-icon">${slide.emoji}</div>
+      <h1 class="page-title">${slide.title}</h1>
+      ${slide.html}
+    </div>
+  `;
+
+  const startBtn = document.getElementById('start-test-btn');
+  if (startBtn) startBtn.addEventListener('click', openTest);
+
+  document.getElementById('breadcrumb-current').textContent = slide.title;
+  document.getElementById('slide-counter').textContent = `${currentSlide+1} / ${SLIDES.length}`;
+  document.getElementById('progress-fill').style.width = (100*(currentSlide+1)/SLIDES.length)+'%';
+  document.getElementById('prev-btn').disabled = currentSlide === 0;
+  document.getElementById('next-btn').disabled = currentSlide === SLIDES.length - 1;
+  document.getElementById('footer-progress').textContent = `${visited.size} / ${SLIDES.length} covered`;
+
+  document.querySelector('.main').scrollTop = 0;
+  renderSidebar();
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= SLIDES.length) return;
+  currentSlide = idx;
+  visited.add(idx);
+  if (!document.getElementById('test-view').classList.contains('hidden')) {
+    closeTest();
+  }
+  renderSlide();
+}
+
+document.getElementById('prev-btn').addEventListener('click', ()=>goTo(currentSlide-1));
+document.getElementById('next-btn').addEventListener('click', ()=>goTo(currentSlide+1));
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (document.getElementById('test-view').classList.contains('hidden')) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); goTo(currentSlide+1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(currentSlide-1); }
+  }
+});
+
+function openTest() {
+  document.getElementById('present-topbar').classList.add('hidden');
+  document.getElementById('presentation').classList.add('hidden');
+  document.getElementById('test-topbar').classList.remove('hidden');
+  document.getElementById('test-view').classList.remove('hidden');
+  renderTest();
+  document.querySelector('.main').scrollTop = 0;
+}
+
+function closeTest() {
+  document.getElementById('present-topbar').classList.remove('hidden');
+  document.getElementById('presentation').classList.remove('hidden');
+  document.getElementById('test-topbar').classList.add('hidden');
+  document.getElementById('test-view').classList.add('hidden');
+}
+
+document.getElementById('open-test-btn').addEventListener('click', openTest);
+document.getElementById('back-to-presentation-btn').addEventListener('click', closeTest);
+
+function renderTest() {
+  const root = document.getElementById('test-view');
+  let html = '';
+
+  if (!testSubmitted) {
+    html += `
+      <div class="test-page">
+        <div class="page-icon">🧪</div>
+        <h1 class="page-title">Workflows 201 — Competency Test</h1>
+        <div class="test-intro">
+          <strong>10 questions · multiple choice · pass mark 7/10.</strong>
+          <p style="margin:6px 0 0 0;">Pick the best answer for each. Pass this and you've got the Workflows path locked in.</p>
+        </div>
+    `;
+
+    QUIZ.forEach((q, i) => {
+      html += `
+        <div class="question" data-q="${i}">
+          <div class="q-num">Question ${i+1} of ${QUIZ.length}</div>
+          <div class="q-text">${q.q}</div>
+          <div class="options">
+            ${q.options.map((opt, oi) => `
+              <label class="option ${testAnswers[i]===oi?'selected':''}">
+                <input type="radio" name="q${i}" value="${oi}" ${testAnswers[i]===oi?'checked':''}/>
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    });
+
+    const answered = testAnswers.filter(a=>a!==null).length;
+    html += `
+        <div class="submit-row">
+          <button class="submit-btn" id="submit-test-btn" ${answered<QUIZ.length?'disabled':''}>
+            ${answered<QUIZ.length ? `Answer all questions (${answered}/${QUIZ.length})` : 'Submit answers'}
+          </button>
+          <span style="color: var(--text-tertiary); font-size:13.5px;">${answered}/${QUIZ.length} answered</span>
+        </div>
+      </div>
+    `;
+  } else {
+    const score = testAnswers.reduce((s, a, i) => s + (a===QUIZ[i].correct?1:0), 0);
+    const passed = score >= 7;
+    const resultMsg = score === 10
+      ? "Perfect score. You've got the Workflows path on lockdown."
+      : passed
+        ? "Solid pass — you're ready for the real Notion Academy quiz."
+        : "Below the pass mark. Skim back through the slides and try again.";
+
+    html += `
+      <div class="test-page">
+        <div class="page-icon">${score===10 ? '🏆' : passed ? '✅' : '📖'}</div>
+        <h1 class="page-title">Your results</h1>
+        <div class="results ${passed?'pass':'fail'}">
+          <div class="score">${score} / 10</div>
+          <h2>${passed ? (score===10 ? 'Perfect!' : 'Passed') : 'Not passed yet'}</h2>
+          <p style="margin:4px 0 0 0;">${resultMsg}</p>
+        </div>
+        <h2>Review</h2>
+    `;
+
+    QUIZ.forEach((q, i) => {
+      const userAns = testAnswers[i];
+      const isRight = userAns === q.correct;
+      html += `
+        <div class="question">
+          <div class="q-num">Question ${i+1} ${isRight ? '· ✅ correct' : '· ❌ incorrect'}</div>
+          <div class="q-text">${q.q}</div>
+          <div class="options">
+            ${q.options.map((opt, oi) => {
+              let cls = 'option';
+              if (oi === q.correct) cls += ' reveal-correct';
+              if (oi === userAns && !isRight) cls += ' incorrect';
+              return `<label class="${cls}"><span style="width:16px; display:inline-block; text-align:center;">${oi===q.correct ? '✓' : (oi===userAns ? '✗' : '')}</span><span>${opt}</span></label>`;
+            }).join('')}
+          </div>
+          <div class="explanation"><strong>Why:</strong> ${q.explain}</div>
+        </div>
+      `;
+    });
+
+    html += `
+        <div class="submit-row">
+          <button class="submit-btn" id="retake-btn">↻ Retake test</button>
+          <button class="test-btn secondary" id="return-btn" style="padding:10px 20px; font-size:15px;">← Back to lesson</button>
+        </div>
+      </div>
+    `;
+  }
+
+  root.innerHTML = html;
+
+  if (!testSubmitted) {
+    root.querySelectorAll('input[type="radio"]').forEach(input => {
+      input.addEventListener('change', e => {
+        const qIdx = parseInt(e.target.name.slice(1));
+        testAnswers[qIdx] = parseInt(e.target.value);
+        renderTest();
+      });
+    });
+    const submit = document.getElementById('submit-test-btn');
+    if (submit) {
+      submit.addEventListener('click', () => {
+        testSubmitted = true;
+        renderTest();
+        document.querySelector('.main').scrollTop = 0;
+      });
+    }
+  } else {
+    document.getElementById('retake-btn').addEventListener('click', () => {
+      testSubmitted = false;
+      testAnswers = new Array(QUIZ.length).fill(null);
+      renderTest();
+      document.querySelector('.main').scrollTop = 0;
+    });
+    document.getElementById('return-btn').addEventListener('click', closeTest);
+  }
+}
+
+renderSlide();
+</script>
+</body>
+</html>

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sam — PM. A library.</title>
+<meta name="description" content="A personal library of training, frameworks, and field notes from the work of building products. Curated by Sam, PM.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,900&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f4ede1;
+  --paper-soft: #ede4d3;
+  --ink: #14110d;
+  --ink-soft: #2c2620;
+  --gray: #756d62;
+  --gray-light: #aea591;
+  --rule: #d4c9b3;
+  --accent: #b62e1c;
+  --accent-dark: #8d2114;
+
+  --display: 'Fraunces', 'Times New Roman', serif;
+  --body: 'Crimson Pro', Georgia, serif;
+  --mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+::selection { background: var(--accent); color: var(--paper); }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+body {
+  font-family: var(--body);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 19px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "kern", "liga", "onum";
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  background-image:
+    radial-gradient(ellipse 1200px 600px at 15% -5%, rgba(182,46,28,0.06), transparent 60%),
+    radial-gradient(ellipse 1000px 500px at 85% 100%, rgba(20,17,13,0.05), transparent 60%);
+}
+
+/* Subtle paper grain */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.25 0 0 0 0 0.18 0 0 0 0.4 0'/></filter><rect width='400' height='400' filter='url(%23n)'/></svg>");
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 48px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ============ NAV ============ */
+nav.top {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(10px) saturate(1.4);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  background: rgba(244,237,225,0.78);
+  border-bottom: 1px solid var(--rule);
+}
+
+nav.top .inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 18px 0;
+}
+
+nav.top .brand {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 24;
+}
+nav.top .brand .tag {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  margin-left: 6px;
+  vertical-align: 4px;
+  text-transform: uppercase;
+}
+
+nav.top .links {
+  display: flex;
+  gap: 32px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+nav.top .links a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  position: relative;
+}
+nav.top .links a::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+nav.top .links a:hover { color: var(--accent); }
+nav.top .links a:hover::after { transform: scaleX(1); }
+
+/* ============ HERO ============ */
+.hero {
+  padding: 110px 0 90px 0;
+  position: relative;
+}
+
+.hero .meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--gray);
+  text-transform: uppercase;
+  margin-bottom: 50px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--rule);
+  font-weight: 500;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.1s ease forwards;
+}
+
+.hero .name {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(7rem, 22vw, 22rem);
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  margin-bottom: 28px;
+  display: block;
+  opacity: 0;
+  animation: fadeUp 1.1s 0.25s cubic-bezier(.22,.61,.36,1) forwards;
+}
+
+.hero .name .dot {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.hero .subline {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 60px;
+  opacity: 0;
+  animation: fadeUp 1s 0.55s ease forwards;
+}
+
+.hero .role {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 6px 12px 5px 12px;
+  border-radius: 2px;
+}
+
+.hero .role .accent { color: var(--accent); }
+
+.hero .qualifier {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 26px;
+  color: var(--ink-soft);
+  font-weight: 400;
+  font-variation-settings: "opsz" 24;
+}
+
+.hero .lede {
+  max-width: 640px;
+  font-size: 25px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  font-weight: 400;
+  font-feature-settings: "kern", "liga", "onum";
+  opacity: 0;
+  animation: fadeUp 0.9s 0.75s ease forwards;
+}
+
+.hero .lede em {
+  font-style: italic;
+  color: var(--accent);
+  font-family: var(--display);
+  font-weight: 500;
+}
+
+.hero-rule {
+  height: 1px;
+  background: var(--rule);
+  margin-top: 90px;
+  position: relative;
+}
+.hero-rule::after {
+  content: '§';
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  transform: translateX(-50%);
+  background: var(--paper);
+  padding: 0 18px;
+  color: var(--accent);
+  font-family: var(--display);
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ============ SECTIONS ============ */
+.section {
+  padding: 90px 0;
+  position: relative;
+}
+
+.section-head {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  align-items: baseline;
+  gap: 24px;
+  margin-bottom: 60px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.section-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.section-head h2 {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 72;
+  font-style: italic;
+}
+
+.section-head .meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--gray);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ============ LIBRARY / ARTIFACTS ============ */
+.artifact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.artifact {
+  display: grid;
+  grid-template-columns: 100px 1fr 220px;
+  gap: 40px;
+  padding: 44px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: start;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  transition: padding-left 0.35s cubic-bezier(.22,.61,.36,1);
+}
+
+.artifact:not(.placeholder)::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.4s cubic-bezier(.22,.61,.36,1);
+}
+
+.artifact:not(.placeholder):hover {
+  padding-left: 16px;
+}
+.artifact:not(.placeholder):hover::before {
+  width: 28px;
+}
+.artifact:not(.placeholder):hover .artifact-title {
+  color: var(--accent);
+}
+.artifact:not(.placeholder):hover .artifact-num {
+  transform: rotate(-4deg) scale(1.05);
+}
+
+.artifact-num {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 64px;
+  font-weight: 500;
+  color: var(--accent);
+  line-height: 1;
+  font-variation-settings: "opsz" 72;
+  transform-origin: left center;
+  transition: transform 0.4s cubic-bezier(.22,.61,.36,1);
+}
+
+.artifact-body {
+  padding-top: 8px;
+}
+
+.artifact-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--gray);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.artifact-title {
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 3.5vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+  font-variation-settings: "opsz" 48;
+  color: var(--ink);
+  transition: color 0.3s ease;
+}
+
+.artifact-desc {
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+  max-width: 56ch;
+}
+
+.artifact-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.artifact-tags span {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 9px 3px 9px;
+  border: 1px solid var(--rule);
+  color: var(--gray);
+  border-radius: 2px;
+}
+
+.artifact-action {
+  text-align: right;
+  padding-top: 12px;
+}
+
+.artifact-cta {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 4px;
+  transition: all 0.25s ease;
+}
+.artifact:not(.placeholder):hover .artifact-cta {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  gap: 14px;
+}
+
+.artifact.placeholder {
+  opacity: 0.55;
+}
+.artifact.placeholder .artifact-num {
+  color: var(--gray-light);
+}
+.artifact.placeholder .artifact-title {
+  color: var(--gray);
+  font-style: italic;
+}
+.artifact.placeholder .artifact-cta {
+  color: var(--gray);
+  border-bottom-color: var(--gray-light);
+  border-bottom-style: dashed;
+}
+
+/* ============ ABOUT ============ */
+.about {
+  background: var(--paper-soft);
+  margin: 0 -100vw;
+  padding-left: 100vw;
+  padding-right: 100vw;
+}
+
+.about .inner {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.about .lead {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 36px;
+  letter-spacing: -0.015em;
+  font-variation-settings: "opsz" 48;
+}
+.about .lead .accent {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.about .body p {
+  font-size: 20px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin-bottom: 20px;
+}
+
+.about .body p strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.about .signature {
+  margin-top: 50px;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 32px;
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 36;
+}
+
+/* ============ STATS / KEYWORDS ============ */
+.keywords {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin: 50px 0 0 0;
+  padding: 30px 0 0 0;
+  border-top: 1px solid var(--rule);
+}
+
+.keyword {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.keyword .num {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 44px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1;
+  font-variation-settings: "opsz" 60;
+}
+
+.keyword .label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--gray);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ============ FOOTER ============ */
+footer {
+  border-top: 1px solid var(--rule);
+  padding: 60px 0 50px 0;
+  margin-top: 60px;
+}
+
+footer .grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 60px;
+  margin-bottom: 60px;
+}
+
+footer .col-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+footer .colophon {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--ink);
+  line-height: 1.4;
+  font-weight: 400;
+  font-variation-settings: "opsz" 24;
+  max-width: 28ch;
+}
+
+footer ul {
+  list-style: none;
+}
+
+footer ul li {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+footer a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-family: var(--body);
+  transition: color 0.2s ease;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 1px;
+}
+footer a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+footer .baseline {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--gray);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1s cubic-bezier(.22,.61,.36,1), transform 1s cubic-bezier(.22,.61,.36,1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 800px) {
+  .wrap { padding: 0 24px; }
+  nav.top .links { gap: 18px; font-size: 10.5px; }
+  nav.top .links a:nth-child(3) { display: none; }
+  .hero { padding: 60px 0 50px 0; }
+  .hero .lede { font-size: 21px; }
+
+  .section { padding: 60px 0; }
+  .section-head {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .section-head .meta { display: none; }
+
+  .artifact {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 36px 0;
+  }
+  .artifact-num { font-size: 50px; }
+  .artifact-action { text-align: left; padding-top: 0; }
+  .artifact:not(.placeholder):hover { padding-left: 0; }
+  .artifact:not(.placeholder)::before { display: none; }
+
+  .keywords { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .keyword .num { font-size: 34px; }
+
+  footer .grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  footer .baseline { flex-direction: column; gap: 8px; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="wrap inner">
+    <div class="brand">Sam<span class="tag">PM</span></div>
+    <div class="links">
+      <a href="#library">Library</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="meta-row">
+      <span>Est. MMXXVI</span>
+      <span>Volume I</span>
+      <span>Field Notes &amp; Frameworks</span>
+    </div>
+    <h1 class="name">Sam<span class="dot">.</span></h1>
+    <div class="subline">
+      <span class="role">PM <span class="accent">·</span> Builder</span>
+      <span class="qualifier">a working library</span>
+    </div>
+    <p class="lede">
+      A growing collection of <em>training, decks, frameworks,</em> and field notes from the work of building products. Made to be useful — to teams, to new hires, to anyone trying to do the thing.
+    </p>
+  </div>
+  <div class="wrap"><div class="hero-rule"></div></div>
+</section>
+
+<!-- ===== LIBRARY ===== -->
+<section id="library" class="section">
+  <div class="wrap">
+    <header class="section-head reveal">
+      <span class="section-num">№ 01</span>
+      <h2>The Library</h2>
+      <span class="meta">Updated as I make</span>
+    </header>
+
+    <div class="artifact-grid">
+
+      <a href="./notion_basics_presentation.html" class="artifact reveal">
+        <div class="artifact-num">01</div>
+        <div class="artifact-body">
+          <div class="artifact-meta">Course · 2026 · ~60 min</div>
+          <h3 class="artifact-title">Notion Basics 101</h3>
+          <p class="artifact-desc">An hour-long, hands-on introduction to Notion — pages, blocks, sharing, databases, and views. Closes with a 10-question competency check designed to mirror the real Notion Academy quiz.</p>
+          <div class="artifact-tags">
+            <span>Onboarding</span>
+            <span>Self-paced</span>
+            <span>Beginner</span>
+          </div>
+        </div>
+        <div class="artifact-action">
+          <span class="artifact-cta">Open course →</span>
+        </div>
+      </a>
+
+      <a href="./notion_workflows_201.html" class="artifact reveal">
+        <div class="artifact-num">02</div>
+        <div class="artifact-body">
+          <div class="artifact-meta">Course · 2026 · ~60 min · Blue Badge</div>
+          <h3 class="artifact-title">Notion Workflows 201</h3>
+          <p class="artifact-desc">The intermediate Workflows path. Synced blocks, linked databases, relations &amp; rollups, automations, AI, and templates. Where Notion stops being notes and becomes a system.</p>
+          <div class="artifact-tags">
+            <span>Workflows</span>
+            <span>Self-paced</span>
+            <span>Intermediate</span>
+          </div>
+        </div>
+        <div class="artifact-action">
+          <span class="artifact-cta">Open course →</span>
+        </div>
+      </a>
+
+      <div class="artifact placeholder reveal">
+        <div class="artifact-num">03</div>
+        <div class="artifact-body">
+          <div class="artifact-meta">In production</div>
+          <h3 class="artifact-title">The next thing.</h3>
+          <p class="artifact-desc">Working on it. Check back soon — or follow the link in the footer to be notified.</p>
+        </div>
+        <div class="artifact-action">
+          <span class="artifact-cta">Coming soon ◌</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about" class="section about">
+  <div class="wrap">
+    <header class="section-head reveal">
+      <span class="section-num">№ 02</span>
+      <h2>About</h2>
+      <span class="meta">Who, why, what</span>
+    </header>
+
+    <div class="inner">
+      <p class="lead reveal">
+        I'm Sam — a product manager who spends a lot of time turning <span class="accent">messy work</span> into clean systems, and clean systems into things teams actually use.
+      </p>
+
+      <div class="body reveal">
+        <p>This site is the public-facing version of that habit. Every artifact here started as something I needed for my own team — onboarding curriculum, a framework for a planning cycle, a template that was easier to share than re-explain. If it earned a second life, it ends up here.</p>
+        <p>Use any of it. Steal from it. Fork it. Tell me when something works for you, or when it doesn't. <strong>The goal is leverage, not vanity.</strong></p>
+      </div>
+
+      <div class="signature reveal">— Sam</div>
+
+      <div class="keywords reveal">
+        <div class="keyword">
+          <span class="num">02</span>
+          <span class="label">Courses live</span>
+        </div>
+        <div class="keyword">
+          <span class="num">2026</span>
+          <span class="label">Founded</span>
+        </div>
+        <div class="keyword">
+          <span class="num">∞</span>
+          <span class="label">Drafts in flight</span>
+        </div>
+        <div class="keyword">
+          <span class="num">01</span>
+          <span class="label">Person behind it</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer id="contact">
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <div class="col-title">Colophon</div>
+        <p class="colophon">
+          Set in <em>Fraunces</em> &amp; <em>Crimson Pro</em>, with <em>JetBrains Mono</em> for the technical bits. Hand-built, no template.
+        </p>
+      </div>
+
+      <div>
+        <div class="col-title">Elsewhere</div>
+        <ul>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">X / Twitter</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">Read.cv</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="col-title">Contact</div>
+        <ul>
+          <li><a href="mailto:hello@example.com">hello@example.com</a></li>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">RSS</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="baseline">
+      <span>© 2026 Sam · PM</span>
+      <span>Made by hand</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Stagger reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        const delay = e.target.dataset.delay || (i * 80);
+        setTimeout(() => e.target.classList.add('in'), delay);
+        io.unobserve(e.target);
+      }
+    });
+  }, { rootMargin: '-50px 0px', threshold: 0.05 });
+
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>

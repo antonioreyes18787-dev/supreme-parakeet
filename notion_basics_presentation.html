@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notion Basics 101 — A 1-hour intro</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --sidebar-bg: #f7f6f3;
+    --text-primary: #37352f;
+    --text-secondary: #787774;
+    --text-tertiary: #9b9a97;
+    --border: #e9e9e7;
+    --border-strong: #d3d1cb;
+    --hover: rgba(55,53,47,0.08);
+    --hover-light: rgba(55,53,47,0.04);
+    --selected: rgba(35,131,226,0.14);
+    --blue: #2383e2;
+    --blue-text: #1f6fc0;
+    --green: #448361;
+    --red: #d44c47;
+    --orange: #d9730d;
+
+    --callout-gray-bg: #f1f1ef;
+    --callout-brown-bg: #f4eeee;
+    --callout-blue-bg: #ddebf1;
+    --callout-yellow-bg: #fdecc8;
+    --callout-green-bg: #ddedea;
+    --callout-red-bg: #fbe4e4;
+    --callout-purple-bg: #eae4f2;
+    --callout-pink-bg: #f4dfeb;
+
+    --code-bg: rgba(135,131,120,0.15);
+    --code-text: #eb5757;
+
+    --shadow-sm: rgba(15,15,15,0.05) 0px 0px 0px 1px, rgba(15,15,15,0.1) 0px 3px 6px, rgba(15,15,15,0.2) 0px 9px 24px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; margin: 0; }
+
+  body {
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+    color: var(--text-primary);
+    background: var(--bg);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar {
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 12px 14px 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .workspace-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #37352f 0%, #5a5852 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .workspace-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .workspace-meta {
+    padding: 0 14px 12px 14px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+
+  .sidebar-section {
+    padding: 8px 6px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .sidebar-section::-webkit-scrollbar { width: 6px; }
+  .sidebar-section::-webkit-scrollbar-thumb { background: rgba(55,53,47,0.15); border-radius: 3px; }
+
+  .sidebar-label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    padding: 8px 10px 4px 10px;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    margin: 1px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-primary);
+    user-select: none;
+    transition: background 0.05s ease;
+  }
+
+  .sidebar-item:hover { background: var(--hover); }
+  .sidebar-item.active { background: var(--selected); font-weight: 500; }
+  .sidebar-item .chev { width: 14px; color: var(--text-tertiary); font-size: 10px; }
+  .sidebar-item .emoji { width: 18px; text-align: center; font-size: 14px; }
+  .sidebar-item .label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sidebar-item .num { color: var(--text-tertiary); font-size: 12px; }
+
+  .sidebar-children { padding-left: 14px; }
+  .sidebar-children .sidebar-item { font-size: 13.5px; }
+
+  .sidebar-section details > summary { list-style: none; }
+  .sidebar-section details > summary::-webkit-details-marker { display: none; }
+  .sidebar-section details > summary::marker { content: ''; }
+  .sidebar-section details > summary .chev {
+    display: inline-block;
+    transition: transform 0.15s ease;
+    transform: rotate(0deg);
+  }
+  .sidebar-section details:not([open]) > summary .chev {
+    transform: rotate(-90deg);
+  }
+
+  .sidebar-footer {
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-tertiary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .test-btn {
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .test-btn:hover { background: #1f1d1a; }
+  .test-btn.secondary {
+    background: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+  }
+  .test-btn.secondary:hover { background: var(--hover-light); }
+
+  /* ---------- MAIN ---------- */
+  .main {
+    background: var(--bg);
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 5;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .breadcrumb { display: flex; gap: 6px; align-items: center; }
+  .breadcrumb .sep { color: var(--text-tertiary); }
+  .breadcrumb .crumb { color: var(--text-secondary); }
+
+  .progress-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 300px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--blue);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .nav-controls { display: flex; gap: 6px; align-items: center; }
+  .nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-btn:hover { background: var(--hover); color: var(--text-primary); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .slide-counter { font-size: 13px; color: var(--text-tertiary); padding: 0 8px; min-width: 50px; text-align: center; }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 80px 120px 80px;
+    animation: pageIn 0.25s ease;
+  }
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-icon {
+    font-size: 70px;
+    line-height: 1;
+    margin-bottom: 14px;
+    user-select: none;
+  }
+
+  .page-cover {
+    margin: -60px -80px 0 -80px;
+    height: 160px;
+    background: linear-gradient(135deg, #ffe9b3 0%, #f8c8a3 50%, #e8a8c0 100%);
+    margin-bottom: 60px;
+  }
+
+  .page-cover.b { background: linear-gradient(135deg, #c5d8e8 0%, #a8c5e0 50%, #8aa8d0 100%); }
+  .page-cover.c { background: linear-gradient(135deg, #d4e6c8 0%, #b8d4a8 50%, #98b888 100%); }
+  .page-cover.d { background: linear-gradient(135deg, #e8d4f0 0%, #d0b8e0 50%, #b89cc8 100%); }
+  .page-cover.e { background: linear-gradient(135deg, #f4d0c8 0%, #ec9c98 50%, #d47880 100%); }
+
+  h1.page-title {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .page p, .page li {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin: 6px 0;
+  }
+
+  .page h2 {
+    font-size: 26px;
+    font-weight: 600;
+    margin: 28px 0 8px 0;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .page h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 20px 0 6px 0;
+    line-height: 1.3;
+  }
+
+  .page ul, .page ol { padding-left: 26px; margin: 6px 0; }
+  .page li { margin: 4px 0; }
+
+  .page strong { font-weight: 600; color: var(--text-primary); }
+
+  .page code, .inline-code {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
+    font-size: 13.6px;
+  }
+
+  .kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--callout-gray-bg);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+
+  /* Callout */
+  .callout {
+    display: flex;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    margin: 16px 0;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .callout .icon { font-size: 20px; line-height: 1.2; flex-shrink: 0; }
+  .callout-gray { background: var(--callout-gray-bg); }
+  .callout-blue { background: var(--callout-blue-bg); }
+  .callout-yellow { background: var(--callout-yellow-bg); }
+  .callout-green { background: var(--callout-green-bg); }
+  .callout-red { background: var(--callout-red-bg); }
+  .callout-purple { background: var(--callout-purple-bg); }
+
+  /* Toggle */
+  details.toggle {
+    margin: 8px 0;
+  }
+  details.toggle summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 4px 0;
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    font-weight: 500;
+  }
+  details.toggle summary::-webkit-details-marker { display: none; }
+  details.toggle summary::before {
+    content: "▶";
+    color: var(--text-tertiary);
+    font-size: 11px;
+    transition: transform 0.15s ease;
+    margin-top: 5px;
+  }
+  details.toggle[open] summary::before { transform: rotate(90deg); }
+  details.toggle > div { padding: 4px 0 4px 18px; }
+
+  /* Divider */
+  hr.div {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+
+  /* Two column */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 14px 0;
+  }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* Cards (used to mimic database cards / view boxes) */
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    background: white;
+    font-size: 14px;
+  }
+  .card .card-title { font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+  .card .card-meta { font-size: 12px; color: var(--text-tertiary); }
+
+  /* Database mock */
+  .db-mock {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 14px 0;
+    font-size: 13.5px;
+  }
+  .db-row {
+    display: grid;
+    grid-template-columns: 2.4fr 1fr 1fr 1.3fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .db-row:last-child { border-bottom: none; }
+  .db-row > div {
+    padding: 7px 10px;
+    border-right: 1px solid var(--border);
+  }
+  .db-row > div:last-child { border-right: none; }
+  .db-header {
+    background: var(--callout-gray-bg);
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 12.5px;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .pill-blue { background: var(--callout-blue-bg); color: #183347; }
+  .pill-yellow { background: var(--callout-yellow-bg); color: #5e421e; }
+  .pill-green { background: var(--callout-green-bg); color: #1c3a2e; }
+  .pill-gray { background: var(--callout-gray-bg); color: var(--text-secondary); }
+  .pill-red { background: var(--callout-red-bg); color: #5d1d1d; }
+  .pill-purple { background: var(--callout-purple-bg); color: #3c2860; }
+
+  /* slash menu */
+  .slash-menu {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: var(--shadow-sm);
+    background: white;
+    padding: 8px 0;
+    margin: 14px 0;
+    max-width: 360px;
+    font-size: 14px;
+  }
+  .slash-menu-label {
+    padding: 4px 14px;
+    color: var(--text-tertiary);
+    font-size: 12px;
+  }
+  .slash-item {
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .slash-item:first-of-type { background: var(--hover); }
+  .slash-item .si-icon {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    background: white;
+  }
+  .slash-item .si-name { font-weight: 500; }
+  .slash-item .si-desc { font-size: 12.5px; color: var(--text-tertiary); }
+
+  /* time tag */
+  .time-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--callout-blue-bg);
+    color: var(--blue-text);
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* TEST MODE */
+  .test-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 50px 60px 100px 60px;
+  }
+
+  .test-intro {
+    background: var(--callout-blue-bg);
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 28px;
+  }
+
+  .question {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    background: white;
+    transition: border-color 0.15s ease;
+  }
+  .question:hover { border-color: var(--border-strong); }
+
+  .q-num {
+    color: var(--text-tertiary);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .q-text {
+    font-size: 16.5px;
+    font-weight: 500;
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 6px; }
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 14.5px;
+    transition: all 0.1s ease;
+  }
+  .option:hover { background: var(--hover-light); }
+  .option input { margin: 0; cursor: pointer; accent-color: var(--blue); }
+  .option.selected { border-color: var(--blue); background: rgba(35,131,226,0.05); }
+  .option.correct { border-color: var(--green); background: var(--callout-green-bg); }
+  .option.incorrect { border-color: var(--red); background: var(--callout-red-bg); }
+  .option.reveal-correct { border-color: var(--green); background: var(--callout-green-bg); }
+
+  .submit-row {
+    margin-top: 28px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .submit-btn {
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .submit-btn:hover { background: #1f1d1a; }
+  .submit-btn:disabled { background: var(--text-tertiary); cursor: not-allowed; }
+
+  .results {
+    background: var(--callout-yellow-bg);
+    padding: 22px 24px;
+    border-radius: 8px;
+    margin-bottom: 28px;
+  }
+  .results.pass { background: var(--callout-green-bg); }
+  .results.fail { background: var(--callout-red-bg); }
+  .results h2 { margin: 0 0 6px 0; font-size: 24px; }
+  .results .score { font-size: 40px; font-weight: 700; margin: 6px 0; }
+
+  .explanation {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--callout-gray-bg);
+    border-radius: 5px;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+  }
+  .explanation strong { color: var(--text-primary); }
+
+  /* Hide presenter mode while in test, vice versa */
+  .hidden { display: none !important; }
+
+  /* Visual: blocks demo */
+  .block-demo {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin: 6px 0;
+    font-size: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .block-demo .handle {
+    color: var(--text-tertiary);
+    cursor: grab;
+    font-size: 14px;
+    user-select: none;
+  }
+  .block-demo .add { color: var(--text-tertiary); font-size: 16px; }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .page { padding: 30px 22px 100px 22px; }
+    .page-cover { margin: -30px -22px 0 -22px; }
+    h1.page-title { font-size: 32px; }
+    .test-page { padding: 30px 22px 80px 22px; }
+    .cols, .cols-3 { grid-template-columns: 1fr; }
+    .db-row { grid-template-columns: 1.5fr 1fr 1fr; font-size: 12px; }
+    .db-row > div:nth-child(4) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="workspace-icon">N</div>
+      <div class="workspace-name">Notion Academy</div>
+    </div>
+    <div class="workspace-meta">Basics 101 · 1 hour course</div>
+
+    <div class="sidebar-section" id="sidebar-list">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="sidebar-footer">
+      <span id="footer-progress">0 / 28 covered</span>
+      <button class="test-btn" id="open-test-btn">Take test</button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- Presentation top bar -->
+    <div class="topbar" id="present-topbar">
+      <div class="breadcrumb">
+        <span class="crumb">📚 Notion Academy</span>
+        <span class="sep">/</span>
+        <span class="crumb" id="breadcrumb-current">Welcome</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="nav-controls">
+        <button class="nav-btn" id="prev-btn" aria-label="Previous">◀</button>
+        <span class="slide-counter" id="slide-counter">1 / 28</span>
+        <button class="nav-btn" id="next-btn" aria-label="Next">▶</button>
+      </div>
+    </div>
+
+    <div id="presentation"></div>
+
+    <!-- Test top bar -->
+    <div class="topbar hidden" id="test-topbar">
+      <div class="breadcrumb">
+        <span class="crumb">📚 Notion Academy</span>
+        <span class="sep">/</span>
+        <span class="crumb">Competency Test</span>
+      </div>
+      <div style="flex:1;"></div>
+      <button class="test-btn secondary" id="back-to-presentation-btn">← Back to lesson</button>
+    </div>
+
+    <div id="test-view" class="hidden"></div>
+
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   SLIDE CONTENT
+   Each slide has: id, emoji, title, time (min into hour), 
+   section, cover (optional), html
+   ============================================================ */
+const SECTIONS = [
+  { id: "intro",     name: "1 · Welcome",                   emoji: "👋" },
+  { id: "what",      name: "2 · What is Notion?",           emoji: "💡" },
+  { id: "blocks",    name: "3 · Pages & blocks",            emoji: "🧱" },
+  { id: "nav",       name: "4 · Sidebar & navigation",      emoji: "🧭" },
+  { id: "share",     name: "5 · Sharing & permissions",     emoji: "🔗" },
+  { id: "db",        name: "6 · Databases",                 emoji: "🗂️" },
+  { id: "views",     name: "7 · Views, sort & filter",      emoji: "🔍" },
+  { id: "wrap",      name: "8 · Wrap-up",                   emoji: "🎯" },
+];
+
+const SLIDES = [
+  // ---------- INTRO ----------
+  {
+    section: "intro", emoji: "🎓", time: "0 min", cover: "a",
+    title: "Notion Basics 101",
+    html: `
+      <p style="font-size:18px; color:var(--text-secondary); margin-top:0;">A 1-hour intro to the building blocks of any Notion workspace.</p>
+      <hr class="div"/>
+      <div class="callout callout-blue">
+        <span class="icon">👋</span>
+        <div>
+          <strong>Welcome.</strong> No prior Notion experience needed. By the end, you'll be comfortable creating pages, organizing content with blocks, sharing work, and using databases. There's a 10-question quiz at the end to check what stuck.
+        </div>
+      </div>
+      <p><strong>Format:</strong> 28 short slides · about 2 minutes each · plus a quiz.</p>
+      <p><span class="time-tag">⏱ ~3 min</span></p>
+    `
+  },
+  {
+    section: "intro", emoji: "🗺️", time: "3 min",
+    title: "What you'll learn",
+    html: `
+      <p>By the end of this hour, you'll be able to:</p>
+      <ul>
+        <li>Explain what Notion is and when to use it</li>
+        <li>Build pages out of <strong>blocks</strong> — Notion's basic unit</li>
+        <li>Navigate the sidebar and find anything fast</li>
+        <li>Share pages and choose the right permission level</li>
+        <li>Create a database, add properties, and switch between views</li>
+        <li>Sort and filter to surface exactly what you need</li>
+      </ul>
+      <div class="callout callout-yellow">
+        <span class="icon">💡</span>
+        <div><strong>Tip:</strong> Open Notion in a second window and try things as we go. You'll learn 10× faster by doing.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+
+  // ---------- WHAT IS NOTION ----------
+  {
+    section: "what", emoji: "💡", time: "5 min", cover: "b",
+    title: "What is Notion?",
+    html: `
+      <p style="font-size:17px;">Notion is a <strong>connected workspace</strong> — one place where notes, docs, projects, and team knowledge live together.</p>
+      <h3>It replaces a stack of tools</h3>
+      <div class="cols-3 cols">
+        <div class="card"><div class="card-title">📝 Docs</div><div class="card-meta">Notes, wikis, SOPs</div></div>
+        <div class="card"><div class="card-title">✅ Tasks</div><div class="card-meta">To-dos, projects, sprints</div></div>
+        <div class="card"><div class="card-title">📊 Databases</div><div class="card-meta">Trackers, CRMs, content calendars</div></div>
+      </div>
+      <p>Instead of hopping between Word, Trello, and a wiki, you build the tools you need in one canvas.</p>
+      <p><span class="time-tag">⏱ ~3 min</span></p>
+    `
+  },
+  {
+    section: "what", emoji: "❤️", time: "8 min",
+    title: "Why people love it",
+    html: `
+      <ul>
+        <li><strong>Flexible.</strong> The same building blocks can become a meeting note, a project tracker, or a homepage.</li>
+        <li><strong>Easy to start, deep when you need it.</strong> A blank page is friendly; databases are powerful.</li>
+        <li><strong>Great for teams.</strong> Real-time collaboration, comments, and shared workspaces.</li>
+        <li><strong>AI built in.</strong> Summarize pages, generate drafts, and search across everything.</li>
+      </ul>
+      <details class="toggle">
+        <summary>Common use cases (click to expand)</summary>
+        <div>
+          <p>Personal: journals, second brains, reading lists, habit trackers, life dashboards.</p>
+          <p>Team: company wikis, project management, OKRs, meeting notes, hiring pipelines, public docs.</p>
+        </div>
+      </details>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+
+  // ---------- BLOCKS / PAGES ----------
+  {
+    section: "blocks", emoji: "📄", time: "10 min", cover: "c",
+    title: "Pages — the foundation",
+    html: `
+      <p>A <strong>page</strong> is a container for content. Almost everything you make in Notion lives on a page.</p>
+      <h3>Pages can be anything</h3>
+      <ul>
+        <li>A note, a wiki article, a meeting agenda</li>
+        <li>A project plan or a homepage</li>
+        <li>A whole database</li>
+      </ul>
+      <h3>Pages can nest infinitely</h3>
+      <p>Open a page → create a sub-page inside it → create another sub-page inside that. This is how you build hierarchy.</p>
+      <div class="callout callout-gray">
+        <span class="icon">🌳</span>
+        <div>Think of pages like folders that also contain content of their own.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "blocks", emoji: "✨", time: "12 min",
+    title: "Creating your first page",
+    html: `
+      <ol>
+        <li>Click <strong>+ Add a page</strong> in the sidebar</li>
+        <li>Type a <strong>title</strong></li>
+        <li>(Optional) Click above the title to add an <strong>icon</strong> (emoji or image)</li>
+        <li>(Optional) Click <strong>Add cover</strong> for a banner image</li>
+        <li>Press <kbd>Enter</kbd> and start typing — your first block appears</li>
+      </ol>
+      <div class="callout callout-blue">
+        <span class="icon">⌨️</span>
+        <div>Quick keyboard: <kbd>Ctrl/Cmd</kbd> + <kbd>N</kbd> creates a new page in the desktop app.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "blocks", emoji: "🧱", time: "14 min",
+    title: "Blocks — the building units",
+    html: `
+      <p style="font-size:17px;"><strong>Almost everything in Notion is a block.</strong></p>
+      <p>A line of text? Block. An image? Block. A heading, a checkbox, a sub-page, a whole database — all blocks. Notion has <strong>500+ block types</strong>.</p>
+      <div class="block-demo"><span class="handle">⋮⋮</span><span class="add">+</span><span>This paragraph is a block</span></div>
+      <div class="block-demo"><span class="handle">⋮⋮</span><span class="add">+</span><span style="font-weight:600; font-size:18px;">This heading is a block</span></div>
+      <div class="block-demo"><span class="handle">⋮⋮</span><span class="add">+</span><span>☐ This to-do item is a block</span></div>
+      <p>Hover any block to see the <span class="inline-code">⋮⋮</span> drag handle and the <span class="inline-code">+</span> add button.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "blocks", emoji: "/", time: "16 min",
+    title: 'The "/" command',
+    html: `
+      <p>Type <kbd>/</kbd> anywhere on a page to open the <strong>block menu</strong>. This is the fastest way to insert anything.</p>
+      <div class="slash-menu">
+        <div class="slash-menu-label">BASIC BLOCKS</div>
+        <div class="slash-item"><div class="si-icon">¶</div><div><div class="si-name">Text</div><div class="si-desc">Just start writing with plain text.</div></div></div>
+        <div class="slash-item"><div class="si-icon">H1</div><div><div class="si-name">Heading 1</div><div class="si-desc">Big section heading.</div></div></div>
+        <div class="slash-item"><div class="si-icon">☐</div><div><div class="si-name">To-do list</div><div class="si-desc">Track tasks with a checkbox.</div></div></div>
+        <div class="slash-item"><div class="si-icon">▸</div><div><div class="si-name">Toggle list</div><div class="si-desc">Click to hide and show content inside.</div></div></div>
+      </div>
+      <p>Keep typing after the slash to filter — e.g. <span class="inline-code">/toggle</span> jumps straight to the toggle block.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "blocks", emoji: "🎨", time: "18 min",
+    title: "Drag, drop, transform",
+    html: `
+      <ul>
+        <li><strong>Move a block:</strong> grab the <span class="inline-code">⋮⋮</span> handle and drag it</li>
+        <li><strong>Make columns:</strong> drag a block to the right edge of another block — Notion creates a column layout automatically</li>
+        <li><strong>Change a block's type:</strong> click <span class="inline-code">⋮⋮</span> → <strong>Turn into</strong> → pick anything (a paragraph becomes a heading, a to-do becomes a bullet, etc.)</li>
+      </ul>
+      <div class="callout callout-yellow">
+        <span class="icon">⚡</span>
+        <div><strong>Power move:</strong> select multiple blocks (click + drag, or <kbd>Shift</kbd>+click) to move or transform them together.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "blocks", emoji: "🛠️", time: "20 min",
+    title: "Practice — build a doc",
+    html: `
+      <div class="callout callout-green">
+        <span class="icon">🛠️</span>
+        <div><strong>Try this in your workspace</strong> (5 minutes):
+          <ol style="margin-top:6px;">
+            <li>Make a page titled <strong>Team SOP</strong></li>
+            <li>Add an emoji icon and a cover</li>
+            <li>Create a heading: <em>Onboarding steps</em></li>
+            <li>Add 3 bullet points underneath</li>
+            <li>Add a <strong>toggle</strong> block titled <em>FAQs</em> and put two Q&amp;As inside</li>
+            <li>Add a <strong>callout</strong> block with a tip</li>
+          </ol>
+        </div>
+      </div>
+      <p><span class="time-tag">⏱ ~5 min</span></p>
+    `
+  },
+
+  // ---------- SIDEBAR / NAVIGATION ----------
+  {
+    section: "nav", emoji: "🧭", time: "25 min", cover: "d",
+    title: "The sidebar",
+    html: `
+      <p>The sidebar on the left is your <strong>home base</strong>. Every page lives in one of these sections:</p>
+      <ul>
+        <li><strong>Teamspaces</strong> — pages shared with a group at work</li>
+        <li><strong>Shared</strong> — pages others invited you to</li>
+        <li><strong>Private</strong> — only you can see these</li>
+        <li><strong>Favorites</strong> — pages you've starred for fast access</li>
+      </ul>
+      <p>Drag pages up and down to reorder them. Click the chevron next to a page to expand it and see its sub-pages.</p>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "nav", emoji: "🔎", time: "27 min",
+    title: "Search & quick switcher",
+    html: `
+      <div class="cols">
+        <div class="card">
+          <div class="card-title">🔍 Search</div>
+          <div class="card-meta">
+            <kbd>Ctrl/Cmd</kbd> + <kbd>P</kbd>
+            <p style="margin-top:8px; font-size:13.5px;">Searches inside page content, not just titles. Find that line you wrote 3 weeks ago.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚡ Quick find</div>
+          <div class="card-meta">
+            <kbd>Ctrl/Cmd</kbd> + <kbd>K</kbd>
+            <p style="margin-top:8px; font-size:13.5px;">Jump to a recent page or run a Notion command (create page, change theme, etc.).</p>
+          </div>
+        </div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "nav", emoji: "⭐", time: "29 min",
+    title: "Customize your sidebar",
+    html: `
+      <ul>
+        <li><strong>Star a page</strong> → it appears in <em>Favorites</em> at the top</li>
+        <li><strong>Drag</strong> pages to reorder or move into other pages</li>
+        <li><strong>Collapse</strong> sections you rarely use</li>
+        <li><strong>Group team pages</strong> into Teamspaces by department or project</li>
+      </ul>
+      <div class="callout callout-purple">
+        <span class="icon">🪄</span>
+        <div>The sidebar is just a view. Anywhere you can see a page, you can drag it to reorganize without breaking links.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+
+  // ---------- SHARING ----------
+  {
+    section: "share", emoji: "🔗", time: "31 min", cover: "e",
+    title: "Sharing pages",
+    html: `
+      <p>Click <strong>Share</strong> in the top-right of any page. You have three ways to share:</p>
+      <ol>
+        <li><strong>Invite specific people</strong> by email or @mention</li>
+        <li><strong>Share with your whole workspace</strong> in one click</li>
+        <li><strong>Publish to the web</strong> as a public link (no Notion account required for visitors)</li>
+      </ol>
+      <div class="callout callout-yellow">
+        <span class="icon">🔒</span>
+        <div>Pages inherit permissions from their parent. A sub-page of a shared page is shared too — unless you change it.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "share", emoji: "🔐", time: "33 min",
+    title: "Permission levels",
+    html: `
+      <p>When you invite someone, choose what they can do:</p>
+      <table style="width:100%; border-collapse:collapse; font-size:14.5px; margin:12px 0;">
+        <tr style="background:var(--callout-gray-bg);">
+          <td style="padding:9px 12px; border:1px solid var(--border); font-weight:600;">Level</td>
+          <td style="padding:9px 12px; border:1px solid var(--border); font-weight:600;">What they can do</td>
+        </tr>
+        <tr><td style="padding:9px 12px; border:1px solid var(--border);"><span class="pill pill-purple">Full access</span></td><td style="padding:9px 12px; border:1px solid var(--border);">Edit content <em>and</em> re-share with others</td></tr>
+        <tr><td style="padding:9px 12px; border:1px solid var(--border);"><span class="pill pill-blue">Can edit</span></td><td style="padding:9px 12px; border:1px solid var(--border);">Edit content, but can't re-share</td></tr>
+        <tr><td style="padding:9px 12px; border:1px solid var(--border);"><span class="pill pill-yellow">Can comment</span></td><td style="padding:9px 12px; border:1px solid var(--border);">Read and leave comments — no editing</td></tr>
+        <tr><td style="padding:9px 12px; border:1px solid var(--border);"><span class="pill pill-gray">Can view</span></td><td style="padding:9px 12px; border:1px solid var(--border);">Read-only</td></tr>
+      </table>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "share", emoji: "🌐", time: "35 min",
+    title: "Publishing to the web",
+    html: `
+      <p>Toggle <strong>Publish</strong> in the Share menu and your page becomes a public website.</p>
+      <ul>
+        <li>Anyone with the link can view — no account required</li>
+        <li>Great for portfolios, public docs, landing pages, FAQs</li>
+        <li>You can disable: <em>editing</em>, <em>commenting</em>, <em>duplicating as template</em>, <em>search engine indexing</em></li>
+      </ul>
+      <div class="callout callout-red">
+        <span class="icon">⚠️</span>
+        <div>Once published, sub-pages are public too. Double-check there's nothing private nested underneath.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "share", emoji: "🛠️", time: "37 min",
+    title: "Practice — share an office manual",
+    html: `
+      <div class="callout callout-green">
+        <span class="icon">🛠️</span>
+        <div><strong>Try this</strong> (5 minutes):
+          <ol style="margin-top:6px;">
+            <li>Create a page called <strong>Office Manual</strong></li>
+            <li>Add 3 sub-headings: <em>Welcome, Tools we use, Time off</em></li>
+            <li>Click <strong>Share</strong> → invite a colleague with <span class="pill pill-blue">Can edit</span></li>
+            <li>Bonus: toggle <strong>Publish</strong> → copy the public link</li>
+          </ol>
+        </div>
+      </div>
+      <p><span class="time-tag">⏱ ~5 min</span></p>
+    `
+  },
+
+  // ---------- DATABASES ----------
+  {
+    section: "db", emoji: "🗂️", time: "42 min", cover: "a",
+    title: "Databases — Notion's superpower",
+    html: `
+      <p style="font-size:17px;">A <strong>database</strong> is a collection of pages with structure.</p>
+      <ul>
+        <li>Each <strong>row</strong> is a page (you can open it and add content inside)</li>
+        <li>Each <strong>column</strong> is a property (text, date, person, status…)</li>
+        <li>The same data can be shown as a table, board, calendar, timeline, gallery, or list</li>
+      </ul>
+      <div class="callout callout-blue">
+        <span class="icon">💡</span>
+        <div>Once you understand databases, your workspace stops being just notes — it becomes a system.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "db", emoji: "🏷️", time: "44 min",
+    title: "Database properties",
+    html: `
+      <p>Properties are the columns. Common ones:</p>
+      <div class="cols">
+        <ul>
+          <li><strong>Text</strong> — short notes</li>
+          <li><strong>Number</strong> — counts, prices</li>
+          <li><strong>Date</strong> — single date or range</li>
+          <li><strong>Checkbox</strong> — done / not done</li>
+          <li><strong>Select</strong> — single tag (Status: Draft)</li>
+        </ul>
+        <ul>
+          <li><strong>Multi-select</strong> — multiple tags</li>
+          <li><strong>Person</strong> — assign someone</li>
+          <li><strong>File</strong> — attach images, PDFs</li>
+          <li><strong>URL / Email / Phone</strong></li>
+          <li><strong>Formula, Relation, Rollup</strong> (advanced)</li>
+        </ul>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "db", emoji: "📅", time: "46 min",
+    title: "Build a content calendar",
+    html: `
+      <p>Imagine a marketing team's content calendar. Properties:</p>
+      <ul>
+        <li><strong>Title</strong> — the page name</li>
+        <li><strong>Status</strong> (Select): Draft / Review / Published</li>
+        <li><strong>Due date</strong> (Date)</li>
+        <li><strong>Owner</strong> (Person)</li>
+      </ul>
+      <div class="db-mock">
+        <div class="db-row db-header"><div>Aa Title</div><div>Status</div><div>Due</div><div>Owner</div></div>
+        <div class="db-row"><div>Q4 launch blog</div><div><span class="pill pill-yellow">Draft</span></div><div>Nov 12</div><div>👤 Maya</div></div>
+        <div class="db-row"><div>Newsletter #18</div><div><span class="pill pill-blue">Review</span></div><div>Nov 14</div><div>👤 Sam</div></div>
+        <div class="db-row"><div>Twitter recap thread</div><div><span class="pill pill-green">Published</span></div><div>Nov 9</div><div>👤 Jules</div></div>
+      </div>
+      <p>Each row opens as a full page where you can draft the content itself.</p>
+      <p><span class="time-tag">⏱ ~3 min</span></p>
+    `
+  },
+
+  // ---------- VIEWS / SORT / FILTER ----------
+  {
+    section: "views", emoji: "👁️", time: "49 min",
+    title: "Database views",
+    html: `
+      <p>The same data, displayed different ways. Click <strong>+ New view</strong> at the top of a database.</p>
+      <div class="cols">
+        <div class="card"><div class="card-title">📋 Table</div><div class="card-meta">Spreadsheet-like rows and columns. The default.</div></div>
+        <div class="card"><div class="card-title">📌 Board</div><div class="card-meta">Kanban-style. Group by status, drag cards across columns.</div></div>
+        <div class="card"><div class="card-title">📅 Calendar</div><div class="card-meta">Pinned to a date property. Great for content schedules.</div></div>
+        <div class="card"><div class="card-title">📊 Timeline</div><div class="card-meta">Gantt-chart style. See date ranges across weeks.</div></div>
+        <div class="card"><div class="card-title">🖼️ Gallery</div><div class="card-meta">Big image cards. Good for portfolios or visual libraries.</div></div>
+        <div class="card"><div class="card-title">📃 List</div><div class="card-meta">Minimal, dense list — like a wiki index.</div></div>
+      </div>
+      <p><span class="time-tag">⏱ ~3 min</span></p>
+    `
+  },
+  {
+    section: "views", emoji: "↕️", time: "52 min",
+    title: "Sorting",
+    html: `
+      <p>Click <strong>Sort</strong> at the top of a database to reorder rows.</p>
+      <ul>
+        <li><strong>Sort by Due date</strong> ascending → soonest deadlines first</li>
+        <li><strong>Sort by Owner</strong> alphabetical → group by person</li>
+        <li><strong>Multiple sorts</strong> stack — first by Status, then by Due date as a tiebreaker</li>
+      </ul>
+      <div class="callout callout-gray">
+        <span class="icon">📌</span>
+        <div>Sorts are saved <em>per view</em>. Your "Calendar" view can sort differently from your "Table" view.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "views", emoji: "🔻", time: "54 min",
+    title: "Filtering",
+    html: `
+      <p>Click <strong>Filter</strong> to show only the rows you want to see right now.</p>
+      <ul>
+        <li><span class="inline-code">Status is Published</span></li>
+        <li><span class="inline-code">Due date is this week</span></li>
+        <li><span class="inline-code">Owner is Me</span></li>
+      </ul>
+      <p>Combine filters with <strong>AND</strong> or <strong>OR</strong> for fine control.</p>
+      <div class="callout callout-blue">
+        <span class="icon">🎯</span>
+        <div><strong>Sort vs Filter</strong> — Sort changes the <em>order</em>. Filter changes which rows are <em>visible</em>.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~3 min</span></p>
+    `
+  },
+  {
+    section: "views", emoji: "🛠️", time: "57 min",
+    title: "Practice — meeting notes DB",
+    html: `
+      <div class="callout callout-green">
+        <span class="icon">🛠️</span>
+        <div><strong>Try this</strong> (5 minutes):
+          <ol style="margin-top:6px;">
+            <li>Type <kbd>/database</kbd> → choose <strong>Database — inline</strong></li>
+            <li>Title it <strong>Meeting Notes</strong></li>
+            <li>Add properties: <em>Date</em> (Date), <em>Attendees</em> (Multi-person), <em>Type</em> (Select: 1:1 / Team / Client)</li>
+            <li>Add a few rows</li>
+            <li>Add a <strong>Calendar view</strong> grouped by Date</li>
+            <li>Filter your Table view to <em>Type is Team</em></li>
+          </ol>
+        </div>
+      </div>
+      <p><span class="time-tag">⏱ ~5 min</span></p>
+    `
+  },
+
+  // ---------- WRAP UP ----------
+  {
+    section: "wrap", emoji: "🎯", time: "62 min", cover: "c",
+    title: "Recap — what you covered",
+    html: `
+      <ul>
+        <li>✅ <strong>Pages and blocks</strong> — the foundation. Slash menu, drag to rearrange.</li>
+        <li>✅ <strong>Sidebar &amp; navigation</strong> — favorites, search, teamspaces.</li>
+        <li>✅ <strong>Sharing &amp; permissions</strong> — four levels, plus public web publishing.</li>
+        <li>✅ <strong>Databases</strong> — rows are pages, columns are properties.</li>
+        <li>✅ <strong>Views, sort, filter</strong> — same data, different lenses.</li>
+      </ul>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "wrap", emoji: "🌱", time: "64 min",
+    title: "Tips for getting started",
+    html: `
+      <ul>
+        <li><strong>Start small.</strong> One useful page beats a perfect system you abandon on day 3.</li>
+        <li><strong>Duplicate templates.</strong> Notion's template gallery is full of well-designed examples — pick one, see how it's built, edit to taste.</li>
+        <li><strong>Iterate.</strong> Your workspace evolves with you. It's normal to redesign things every few months.</li>
+        <li><strong>Use AI when stuck.</strong> Type <kbd>Space</kbd> on a blank line for Notion AI suggestions.</li>
+      </ul>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "wrap", emoji: "📚", time: "66 min",
+    title: "Where to go next",
+    html: `
+      <ul>
+        <li><strong>Notion Academy</strong> — academy.notion.com (intermediate &amp; advanced courses)</li>
+        <li><strong>Templates Gallery</strong> — notion.com/templates</li>
+        <li><strong>Help Center</strong> — notion.com/help</li>
+        <li><strong>r/Notion</strong> on Reddit, plus YouTube channels like Thomas Frank Explains and Marie Poulin</li>
+      </ul>
+      <div class="callout callout-purple">
+        <span class="icon">🎓</span>
+        <div>Once you're comfortable, the <em>Workspace Essentials</em> path on Notion Academy covers automations, formulas, and architecture.</div>
+      </div>
+      <p><span class="time-tag">⏱ ~2 min</span></p>
+    `
+  },
+  {
+    section: "wrap", emoji: "🧪", time: "68 min",
+    title: "Ready for the test?",
+    html: `
+      <p style="font-size:17px;">Ten quick multiple-choice questions to check what stuck.</p>
+      <ul>
+        <li>Untimed</li>
+        <li>You can change answers before submitting</li>
+        <li>Pass mark: 7 / 10</li>
+      </ul>
+      <div style="margin-top:24px;">
+        <button class="submit-btn" id="start-test-btn">Start the competency test →</button>
+      </div>
+    `
+  },
+];
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+const QUIZ = [
+  {
+    q: "What is the basic building unit of any Notion page?",
+    options: ["A row", "A block", "A widget", "A frame"],
+    correct: 1,
+    explain: "Almost everything in Notion is a block — text, headings, images, to-dos, even databases."
+  },
+  {
+    q: "Which keyboard character opens the block menu?",
+    options: ["#", "/", "@", "+"],
+    correct: 1,
+    explain: "Typing / on any line brings up the block menu so you can insert headings, toggles, callouts, databases, and more."
+  },
+  {
+    q: "Which of these is NOT one of Notion's standard database views?",
+    options: ["Table", "Board", "Calendar", "Spreadsheet"],
+    correct: 3,
+    explain: "Standard views include Table, Board, Calendar, Timeline, Gallery, and List. There's no view literally called Spreadsheet — Table is the closest."
+  },
+  {
+    q: "You want a teammate to read a page and leave comments, but not edit anything. Which permission level fits?",
+    options: ["Full access", "Can edit", "Can comment", "Can view"],
+    correct: 2,
+    explain: "Can comment is read-only with the ability to leave comments. Can view is read-only without commenting."
+  },
+  {
+    q: "You want to see only the items where Status is \"In progress\" in a database. What do you use?",
+    options: ["Sort", "Filter", "Search", "Group"],
+    correct: 1,
+    explain: "Filter changes which rows are visible. Sort changes the order. They're often used together."
+  },
+  {
+    q: "In a Notion database, each row is also...",
+    options: ["A column", "A formula", "A page", "A workspace"],
+    correct: 2,
+    explain: "Every row is a full page. You can open it and add headings, paragraphs, sub-databases — anything."
+  },
+  {
+    q: "How can you make a page accessible to anyone with a link, no Notion account required?",
+    options: [
+      "Mark it as a Favorite",
+      "Move it to your Private section",
+      "Publish it to the web from the Share menu",
+      "Convert it into a database"
+    ],
+    correct: 2,
+    explain: "The Publish toggle in the Share menu turns the page into a public website."
+  },
+  {
+    q: "If you sort a Date property in ascending order, what do you see first?",
+    options: [
+      "The most recent dates",
+      "The earliest dates",
+      "Items with no date",
+      "Today's items only"
+    ],
+    correct: 1,
+    explain: "Ascending = smallest to largest, so the earliest dates appear first."
+  },
+  {
+    q: "Why is page nesting useful in Notion?",
+    options: [
+      "Nested pages cost less than top-level pages",
+      "It lets you organize related content into clear hierarchies",
+      "Nested pages are automatically published to the web",
+      "Databases only work inside nested pages"
+    ],
+    correct: 1,
+    explain: "Pages can contain pages can contain pages. This is how you build wikis, project hubs, and structured knowledge bases."
+  },
+  {
+    q: "You're brand new to Notion. What's the most realistic way to start?",
+    options: [
+      "Design a perfect, complete system before you use it",
+      "Avoid templates so you learn everything from scratch",
+      "Start small with a few useful pages and iterate over time",
+      "Only use databases — never plain pages"
+    ],
+    correct: 2,
+    explain: "Workspaces evolve. Build one page that's useful today, expand from there, and redesign as needs change."
+  },
+];
+
+/* ============================================================
+   STATE & RENDERING
+   ============================================================ */
+let currentSlide = 0;
+let visited = new Set([0]);
+let testAnswers = new Array(QUIZ.length).fill(null);
+let testSubmitted = false;
+
+function renderSidebar() {
+  const root = document.getElementById('sidebar-list');
+  let html = '<div class="sidebar-label">Course outline</div>';
+
+  for (const sec of SECTIONS) {
+    const slidesInSec = SLIDES.map((s,i)=>({s,i})).filter(x=>x.s.section===sec.id);
+    const visitedInSec = slidesInSec.filter(x=>visited.has(x.i)).length;
+    const allDone = visitedInSec === slidesInSec.length;
+    html += `
+      <details ${slidesInSec.some(x=>x.i===currentSlide)?'open':''}>
+        <summary class="sidebar-item" style="font-weight:500; list-style:none;">
+          <span class="chev">▾</span>
+          <span class="emoji">${sec.emoji}</span>
+          <span class="label">${sec.name}</span>
+          <span class="num">${visitedInSec}/${slidesInSec.length}</span>
+        </summary>
+        <div class="sidebar-children">
+          ${slidesInSec.map(x => `
+            <div class="sidebar-item ${x.i===currentSlide?'active':''}" data-slide="${x.i}">
+              <span class="chev"></span>
+              <span class="emoji">${x.s.emoji}</span>
+              <span class="label">${x.s.title}</span>
+            </div>
+          `).join('')}
+        </div>
+      </details>
+    `;
+  }
+  root.innerHTML = html;
+
+  // Hide details summary chev (we use our own)
+  root.querySelectorAll('summary').forEach(s => {
+    s.style.cursor = 'pointer';
+  });
+
+  root.querySelectorAll('.sidebar-item[data-slide]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      goTo(parseInt(el.dataset.slide));
+    });
+  });
+}
+
+function renderSlide() {
+  const slide = SLIDES[currentSlide];
+  const root = document.getElementById('presentation');
+
+  const coverHtml = slide.cover ? `<div class="page-cover ${slide.cover}"></div>` : '';
+
+  root.innerHTML = `
+    <div class="page" key="${currentSlide}">
+      ${coverHtml}
+      <div class="page-icon">${slide.emoji}</div>
+      <h1 class="page-title">${slide.title}</h1>
+      ${slide.html}
+    </div>
+  `;
+
+  // attach start-test button if present
+  const startBtn = document.getElementById('start-test-btn');
+  if (startBtn) startBtn.addEventListener('click', openTest);
+
+  // update topbar
+  document.getElementById('breadcrumb-current').textContent = slide.title;
+  document.getElementById('slide-counter').textContent = `${currentSlide+1} / ${SLIDES.length}`;
+  document.getElementById('progress-fill').style.width = (100*(currentSlide+1)/SLIDES.length)+'%';
+  document.getElementById('prev-btn').disabled = currentSlide === 0;
+  document.getElementById('next-btn').disabled = currentSlide === SLIDES.length - 1;
+
+  document.getElementById('footer-progress').textContent = `${visited.size} / ${SLIDES.length} covered`;
+
+  // scroll main to top
+  document.querySelector('.main').scrollTop = 0;
+
+  renderSidebar();
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= SLIDES.length) return;
+  currentSlide = idx;
+  visited.add(idx);
+  // exit test mode if user navigates from sidebar
+  if (!document.getElementById('test-view').classList.contains('hidden')) {
+    closeTest();
+  }
+  renderSlide();
+}
+
+document.getElementById('prev-btn').addEventListener('click', ()=>goTo(currentSlide-1));
+document.getElementById('next-btn').addEventListener('click', ()=>goTo(currentSlide+1));
+
+document.addEventListener('keydown', e => {
+  // Don't intercept when typing in an input
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (document.getElementById('test-view').classList.contains('hidden')) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); goTo(currentSlide+1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(currentSlide-1); }
+  }
+});
+
+/* ============================================================
+   TEST MODE
+   ============================================================ */
+function openTest() {
+  document.getElementById('present-topbar').classList.add('hidden');
+  document.getElementById('presentation').classList.add('hidden');
+  document.getElementById('test-topbar').classList.remove('hidden');
+  document.getElementById('test-view').classList.remove('hidden');
+  renderTest();
+  document.querySelector('.main').scrollTop = 0;
+}
+
+function closeTest() {
+  document.getElementById('present-topbar').classList.remove('hidden');
+  document.getElementById('presentation').classList.remove('hidden');
+  document.getElementById('test-topbar').classList.add('hidden');
+  document.getElementById('test-view').classList.add('hidden');
+}
+
+document.getElementById('open-test-btn').addEventListener('click', openTest);
+document.getElementById('back-to-presentation-btn').addEventListener('click', closeTest);
+
+function renderTest() {
+  const root = document.getElementById('test-view');
+  let html = '';
+
+  if (!testSubmitted) {
+    html += `
+      <div class="test-page">
+        <div class="page-icon">🧪</div>
+        <h1 class="page-title">Notion Basics — Competency Test</h1>
+        <div class="test-intro">
+          <strong>10 questions · multiple choice · pass mark 7/10.</strong>
+          <p style="margin:6px 0 0 0;">Pick the best answer for each. You can change your mind before submitting.</p>
+        </div>
+    `;
+
+    QUIZ.forEach((q, i) => {
+      html += `
+        <div class="question" data-q="${i}">
+          <div class="q-num">Question ${i+1} of ${QUIZ.length}</div>
+          <div class="q-text">${q.q}</div>
+          <div class="options">
+            ${q.options.map((opt, oi) => `
+              <label class="option ${testAnswers[i]===oi?'selected':''}">
+                <input type="radio" name="q${i}" value="${oi}" ${testAnswers[i]===oi?'checked':''}/>
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    });
+
+    const answered = testAnswers.filter(a=>a!==null).length;
+    html += `
+        <div class="submit-row">
+          <button class="submit-btn" id="submit-test-btn" ${answered<QUIZ.length?'disabled':''}>
+            ${answered<QUIZ.length ? `Answer all questions (${answered}/${QUIZ.length})` : 'Submit answers'}
+          </button>
+          <span style="color: var(--text-tertiary); font-size:13.5px;">${answered}/${QUIZ.length} answered</span>
+        </div>
+      </div>
+    `;
+  } else {
+    // RESULTS
+    const score = testAnswers.reduce((s, a, i) => s + (a===QUIZ[i].correct?1:0), 0);
+    const passed = score >= 7;
+    const resultMsg = score === 10
+      ? "Perfect score. You've nailed the fundamentals."
+      : passed
+        ? "Solid pass — you've got the basics down."
+        : "Below the pass mark. Skim back through the slides and try again.";
+
+    html += `
+      <div class="test-page">
+        <div class="page-icon">${score===10 ? '🏆' : passed ? '✅' : '📖'}</div>
+        <h1 class="page-title">Your results</h1>
+        <div class="results ${passed?'pass':'fail'}">
+          <div class="score">${score} / 10</div>
+          <h2>${passed ? (score===10 ? 'Perfect!' : 'Passed') : 'Not passed yet'}</h2>
+          <p style="margin:4px 0 0 0;">${resultMsg}</p>
+        </div>
+
+        <h2>Review</h2>
+    `;
+
+    QUIZ.forEach((q, i) => {
+      const userAns = testAnswers[i];
+      const isRight = userAns === q.correct;
+      html += `
+        <div class="question">
+          <div class="q-num">Question ${i+1} ${isRight ? '· ✅ correct' : '· ❌ incorrect'}</div>
+          <div class="q-text">${q.q}</div>
+          <div class="options">
+            ${q.options.map((opt, oi) => {
+              let cls = 'option';
+              if (oi === q.correct) cls += ' reveal-correct';
+              if (oi === userAns && !isRight) cls += ' incorrect';
+              return `<label class="${cls}"><span style="width:16px; display:inline-block; text-align:center;">${oi===q.correct ? '✓' : (oi===userAns ? '✗' : '')}</span><span>${opt}</span></label>`;
+            }).join('')}
+          </div>
+          <div class="explanation"><strong>Why:</strong> ${q.explain}</div>
+        </div>
+      `;
+    });
+
+    html += `
+        <div class="submit-row">
+          <button class="submit-btn" id="retake-btn">↻ Retake test</button>
+          <button class="test-btn secondary" id="return-btn" style="padding:10px 20px; font-size:15px;">← Back to lesson</button>
+        </div>
+      </div>
+    `;
+  }
+
+  root.innerHTML = html;
+
+  // Wire up
+  if (!testSubmitted) {
+    root.querySelectorAll('input[type="radio"]').forEach(input => {
+      input.addEventListener('change', e => {
+        const qIdx = parseInt(e.target.name.slice(1));
+        testAnswers[qIdx] = parseInt(e.target.value);
+        renderTest();
+      });
+    });
+    const submit = document.getElementById('submit-test-btn');
+    if (submit) {
+      submit.addEventListener('click', () => {
+        testSubmitted = true;
+        renderTest();
+        document.querySelector('.main').scrollTop = 0;
+      });
+    }
+  } else {
+    document.getElementById('retake-btn').addEventListener('click', () => {
+      testSubmitted = false;
+      testAnswers = new Array(QUIZ.length).fill(null);
+      renderTest();
+      document.querySelector('.main').scrollTop = 0;
+    });
+    document.getElementById('return-btn').addEventListener('click', closeTest);
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderSlide();
+
+</script>
+</body>
+</html>
